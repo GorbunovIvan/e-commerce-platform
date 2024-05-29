@@ -6,20 +6,26 @@ import jakarta.annotation.PostConstruct;
 import org.example.model.User;
 import org.example.model.UserDTO;
 import org.example.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,11 +42,39 @@ class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private JwtDecoder jwtDecoder;
+
+    private Jwt jwt;
+
     private final String baseURI = "/api/v1/users";
 
     @PostConstruct
     void init() {
         objectMapper.findAndRegisterModules();
+    }
+
+    @BeforeEach
+    public void setUp() {
+
+        // Create a mock JWT token
+        jwt = Jwt.withTokenValue("mock-token")
+                .header("alg", "none")
+                .claim("iat", Instant.now())
+                .claim("exp", Instant.now().plusSeconds(3600))
+                .build();
+
+        // Mock the JwtDecoder to return the mock JWT token
+        given(jwtDecoder.decode("mock-token")).willReturn(jwt);
+    }
+
+    @Test
+    void shouldResponseUnauthorizedWhenGetAll() throws Exception {
+
+        mockMvc.perform(get(baseURI))
+                .andExpect(status().isForbidden());
+
+        verify(userService, never()).getAll();
     }
 
     @Test
@@ -54,7 +88,8 @@ class UserControllerTest {
 
         when(userService.getAll()).thenReturn(usersExpected);
 
-        var jsonResponse = mockMvc.perform(get(baseURI))
+        var jsonResponse = mockMvc.perform(get(baseURI)
+                        .with(jwt().jwt(jwt)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -74,7 +109,8 @@ class UserControllerTest {
 
         when(userService.getAll()).thenReturn(Collections.emptyList());
 
-        var jsonResponse = mockMvc.perform(get(baseURI))
+        var jsonResponse = mockMvc.perform(get(baseURI)
+                        .with(jwt().jwt(jwt)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -97,7 +133,8 @@ class UserControllerTest {
 
         when(userService.getById(id)).thenReturn(userExpected);
 
-        var jsonResponse = mockMvc.perform(get(baseURI + "/{id}", id))
+        var jsonResponse = mockMvc.perform(get(baseURI + "/{id}", id)
+                        .with(jwt().jwt(jwt)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -117,7 +154,8 @@ class UserControllerTest {
 
         var id = 1L;
 
-        mockMvc.perform(get(baseURI + "/{id}", id))
+        mockMvc.perform(get(baseURI + "/{id}", id)
+                        .with(jwt().jwt(jwt)))
                 .andExpect(status().isNotFound());
 
         verify(userService, times(1)).getById(id);
@@ -132,7 +170,8 @@ class UserControllerTest {
 
         when(userService.getByUsername(any())).thenReturn(userExpected);
 
-        var jsonResponse = mockMvc.perform(get(baseURI + "/username/{username}", username))
+        var jsonResponse = mockMvc.perform(get(baseURI + "/username/{username}", username)
+                    .with(jwt().jwt(jwt)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -152,7 +191,8 @@ class UserControllerTest {
 
         var username = "username-of-user";
 
-        mockMvc.perform(get(baseURI + "/username/{username}", username))
+        mockMvc.perform(get(baseURI + "/username/{username}", username)
+                        .with(jwt().jwt(jwt)))
                 .andExpect(status().isNotFound());
 
         verify(userService, times(1)).getByUsername(any());
@@ -176,6 +216,7 @@ class UserControllerTest {
         var jsonUserDTO = objectMapper.writeValueAsString(userDTO);
 
         var jsonResponse = mockMvc.perform(post(baseURI)
+                        .with(jwt().jwt(jwt))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUserDTO))
                 .andExpect(status().isOk())
@@ -213,6 +254,7 @@ class UserControllerTest {
         var jsonUserDTO = objectMapper.writeValueAsString(userDTO);
 
         var jsonResponse = mockMvc.perform(patch(baseURI + "/{id}", id)
+                        .with(jwt().jwt(jwt))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUserDTO))
                 .andExpect(status().isOk())
@@ -240,6 +282,7 @@ class UserControllerTest {
         var jsonUserDTO = objectMapper.writeValueAsString(userDTO);
 
         mockMvc.perform(patch(baseURI + "/{id}", id)
+                        .with(jwt().jwt(jwt))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUserDTO))
                 .andExpect(status().isNotFound());
@@ -253,7 +296,8 @@ class UserControllerTest {
 
         var id = 1L;
 
-        mockMvc.perform(delete(baseURI + "/{id}", id))
+        mockMvc.perform(delete(baseURI + "/{id}", id)
+                    .with(jwt().jwt(jwt)))
                 .andExpect(status().isAccepted());
 
         verify(userService, times(1)).deleteById(id);
