@@ -1,2 +1,4 @@
 rootProject.name = 'e-commerce-platform'
 
+include('user-service')
+
