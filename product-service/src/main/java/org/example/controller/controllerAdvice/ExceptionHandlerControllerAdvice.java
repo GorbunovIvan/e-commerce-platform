@@ -15,7 +15,7 @@ public class ExceptionHandlerControllerAdvice {
     private ResponseEntity<String> handleException(ConstraintViolationException e) {
         var message = e.getConstraintViolations().stream()
                 .map(c -> c.getPropertyPath() + " - " + c.getMessage())
-                .collect(Collectors.joining("/n"));
+                .collect(Collectors.joining("\n"));
         return new ResponseEntity<>(message, HttpStatusCode.valueOf(400));
     }
 }
