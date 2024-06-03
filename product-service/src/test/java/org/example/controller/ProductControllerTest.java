@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -37,6 +38,9 @@ class ProductControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private Jwt jwt;
+
     private final EasyRandom easyRandom = new EasyRandom();
 
     @PostConstruct
@@ -48,6 +52,17 @@ class ProductControllerTest {
     }
 
     @Test
+    void shouldResponseUnauthorizedWhenGetAll() {
+
+        RestAssured.when()
+                .get()
+                .then()
+                .statusCode(401);
+
+        verify(productService, never()).getAll();
+    }
+
+    @Test
     void shouldReturnListOfProductsWhenGetAll() throws Exception {
 
         var productsExpected = easyRandom.objects(Product.class, 5).toList();
@@ -55,7 +70,9 @@ class ProductControllerTest {
         when(productService.getAll()).thenReturn(productsExpected);
 
         var jsonResponse =
-                RestAssured.when()
+                given()
+                        .auth().oauth2(jwt.getTokenValue())
+                        .when()
                         .get()
                         .then()
                         .statusCode(200)
@@ -77,7 +94,9 @@ class ProductControllerTest {
         when(productService.getAll()).thenReturn(Collections.emptyList());
 
         var jsonResponse =
-                RestAssured.when()
+                given()
+                        .auth().oauth2(jwt.getTokenValue())
+                        .when()
                         .get()
                         .then()
                         .statusCode(200)
@@ -105,6 +124,7 @@ class ProductControllerTest {
 
         var jsonResponse =
                 given()
+                        .auth().oauth2(jwt.getTokenValue())
                         .param("name", productExpected.getName())
                         .when()
                         .get()
@@ -134,6 +154,7 @@ class ProductControllerTest {
 
         var jsonResponse =
                 given()
+                        .auth().oauth2(jwt.getTokenValue())
                         .param("name", productExpected.getName())
                         .when()
                         .get()
@@ -163,6 +184,7 @@ class ProductControllerTest {
 
         var jsonResponse =
                 given()
+                        .auth().oauth2(jwt.getTokenValue())
                         .param("category", productExpected.getCategory().getName())
                         .when()
                         .get()
@@ -192,6 +214,7 @@ class ProductControllerTest {
 
         var jsonResponse =
                 given()
+                        .auth().oauth2(jwt.getTokenValue())
                         .param("category", productExpected.getCategory().getName())
                         .when()
                         .get()
@@ -221,6 +244,7 @@ class ProductControllerTest {
 
         var jsonResponse =
                 given()
+                        .auth().oauth2(jwt.getTokenValue())
                         .param("user", productExpected.getUser().getId().toString())
                         .when()
                         .get()
@@ -250,6 +274,7 @@ class ProductControllerTest {
 
         var jsonResponse =
                 given()
+                        .auth().oauth2(jwt.getTokenValue())
                         .param("user", productExpected.getUser().getId().toString())
                         .when()
                         .get()
@@ -281,6 +306,7 @@ class ProductControllerTest {
 
         var jsonResponse =
                 given()
+                        .auth().oauth2(jwt.getTokenValue())
                         .param("name", productExpected.getName())
                         .param("category", productExpected.getCategory().getName())
                         .param("user", productExpected.getUser().getId().toString())
@@ -314,6 +340,7 @@ class ProductControllerTest {
 
         var jsonResponse =
                 given()
+                        .auth().oauth2(jwt.getTokenValue())
                         .param("name", productExpected.getName())
                         .param("category", productExpected.getCategory().getName())
                         .param("user", productExpected.getUser().getId().toString())
@@ -342,7 +369,9 @@ class ProductControllerTest {
         when(productService.getById(id)).thenReturn(productExpected);
 
         var jsonResponse =
-                RestAssured.when()
+                given()
+                        .auth().oauth2(jwt.getTokenValue())
+                        .when()
                         .get("/{id}", id)
                         .then()
                         .statusCode(200)
@@ -363,7 +392,9 @@ class ProductControllerTest {
 
         var id = 95L;
 
-        RestAssured.when()
+        given()
+                .auth().oauth2(jwt.getTokenValue())
+                .when()
                 .get("/{id}", id)
                 .then()
                 .statusCode(404);
@@ -390,6 +421,7 @@ class ProductControllerTest {
 
         var jsonResponse =
                 given()
+                        .auth().oauth2(jwt.getTokenValue())
                         .contentType("application/json")
                         .body(jsonProductDTO)
                         .when()
@@ -431,6 +463,7 @@ class ProductControllerTest {
 
         var jsonResponse =
                 given()
+                        .auth().oauth2(jwt.getTokenValue())
                         .contentType("application/json")
                         .body(jsonProductDTO)
                         .when()
@@ -461,6 +494,7 @@ class ProductControllerTest {
         var jsonProductDTO = objectMapper.writeValueAsString(productDTO);
 
         given()
+                .auth().oauth2(jwt.getTokenValue())
                 .contentType("application/json")
                 .body(jsonProductDTO)
                 .when()
@@ -478,6 +512,7 @@ class ProductControllerTest {
         var id = 77L;
 
         given()
+                .auth().oauth2(jwt.getTokenValue())
                 .when()
                 .delete("/{id}", id)
                 .then()
