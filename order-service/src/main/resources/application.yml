@@ -1,0 +1,14 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: order-service
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/e-commerce-platform-order-service
+  graphql:
+    graphiql:
+      enabled: true
+  rabbitmq:
+    host: localhost
