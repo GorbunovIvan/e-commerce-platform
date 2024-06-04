@@ -12,3 +12,4 @@ spring:
       enabled: true
   rabbitmq:
     host: localhost
+    queue: order-service-queue
