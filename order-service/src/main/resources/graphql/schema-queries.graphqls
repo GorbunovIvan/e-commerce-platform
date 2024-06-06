@@ -1,0 +1,30 @@
+type Query {
+
+    # orders
+    getOrderById(id: String): Order
+    getAllOrders: [Order]
+    getAllOrdersByUser(userId: Int): [Order]
+    getAllOrdersByProduct(productId: Int): [Order]
+
+    # statuses
+    getStatusRecordById(id: String): StatusRecord
+    getAllStatusRecordsByOrder(orderId: String): [StatusRecord]
+    getAllCurrentStatusRecords: [StatusRecord]
+    getAllStatusRecordsByCurrentStatus(status: String): [StatusRecord]
+    getCurrentStatusOfOrder(orderId: String): String
+}
+
+type Order {
+    id: String
+    userId: Int
+    productId: Int
+    createdAt: String # example - 2024-06-06T12:31:25
+    status: String # one of [CREATED, IN_PROGRESS, IN_A_WAY, DELIVERED, DELETED]
+}
+
+type StatusRecord {
+    id: String
+    orderId: String
+    status: String # one of [CREATED, IN_PROGRESS, IN_A_WAY, DELIVERED, DELETED]
+    time: String # example - 2024-06-06T12:31:25
+}

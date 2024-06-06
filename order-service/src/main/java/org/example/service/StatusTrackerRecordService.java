@@ -57,7 +57,7 @@ public class StatusTrackerRecordService {
 
     public Map<String, Status> getCurrentStatusesOfOrders(@NonNull List<String> orderIds) {
 
-        log.info("Searching for current status of orders={}", orderIds);
+        log.info("Searching for current statuses of orders={}", orderIds);
 
         var trackerRecords = statusTrackerRecordRepository.findAllByOrderIdIn(orderIds);
         var mapOrderIdAndLastStatusRecord = trackerRecords.stream()
