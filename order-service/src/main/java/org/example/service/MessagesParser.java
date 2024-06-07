@@ -1,11 +1,10 @@
 package org.example.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.model.dto.OrderDTO;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,19 +21,10 @@ public class MessagesParser {
         objectMapper.findAndRegisterModules();
     }
 
-    OrderDTO parseOrderFromMessage(String message) {
+    public <T> T parseToObject(byte[] message, @NonNull Class<T> clazz) {
         try {
-            log.info("Parsing order from json: {}", message);
-            return objectMapper.readValue(message, OrderDTO.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    OrderDTO parseOrderFromMessage(byte[] message) {
-        try {
-            log.info("Parsing order from bytes");
-            return objectMapper.readValue(message, OrderDTO.class);
+            log.info("Parsing message from bytes to type {}", clazz.getName());
+            return objectMapper.readValue(message, clazz);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

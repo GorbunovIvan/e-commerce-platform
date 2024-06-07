@@ -95,8 +95,12 @@ public class StatusTrackerRecordService {
     }
 
     public Order updateStatusForOrder(@NonNull Order order, @NonNull Status status) {
+        var statusReturned = updateStatusForOrder(order.getId(), status);
+        order.setStatus(statusReturned);
+        return order;
+    }
 
-        var orderId = order.getId();
+    public Status updateStatusForOrder(String orderId, @NonNull Status status) {
 
         log.info("Updating status for order with id={}, new status={}", orderId, status);
 
@@ -107,9 +111,7 @@ public class StatusTrackerRecordService {
 
         var statusTrackerRecord = create(statusTrackerRecordDTO);
 
-        order.setStatus(statusTrackerRecord.getStatusObj());
-
-        return order;
+        return statusTrackerRecord.getStatusObj();
     }
 
     public void deleteById(String id) {

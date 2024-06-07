@@ -20,7 +20,6 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final StatusTrackerRecordService statusTrackerRecordService;
-    private final MessagesParser messagesParser;
 
     public Order getById(String id) {
         log.info("Searching for order with id={}", id);
@@ -48,16 +47,6 @@ public class OrderService {
         var orders = orderRepository.findAllByProductId(productId);
         fillCurrentStatusesToOrders(orders);
         return orders;
-    }
-
-    public Order create(byte[] orderMessage) {
-        var orderDTO = messagesParser.parseOrderFromMessage(orderMessage);
-        return create(orderDTO);
-    }
-
-    public Order create(String orderMessage) {
-        var orderDTO = messagesParser.parseOrderFromMessage(orderMessage);
-        return create(orderDTO);
     }
 
     public Order create(@NonNull OrderDTO orderDTO) {
@@ -120,6 +109,7 @@ public class OrderService {
     public void deleteById(String id) {
         log.warn("Deleting order by id={}", id);
         orderRepository.deleteById(id);
+        statusTrackerRecordService.updateStatusForOrder(id, Status.DELETED);
     }
 
     private void fillCurrentStatusToOrder(@NonNull Order order) {
@@ -145,7 +135,7 @@ public class OrderService {
             if (status != null) {
                 order.setStatus(status);
             } else {
-                log.warn("Status for order with id={} not found", order.getId());
+                log.warn("Status of order with id={} not found", order.getId());
             }
         }
     }
