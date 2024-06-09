@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Document(collection = "orders")
 @NoArgsConstructor @AllArgsConstructor
@@ -20,6 +21,8 @@ public class Order {
 
     private Long userId;
     private Long productId;
+
+    @EqualsAndHashCode.Exclude
     private LocalDateTime createdAt;
 
     @Transient
@@ -30,5 +33,13 @@ public class Order {
         this.userId = userId;
         this.productId = productId;
         this.createdAt = createdAt;
+    }
+
+    @EqualsAndHashCode.Include
+    public LocalDateTime getCreatedAt() {
+        if (this.createdAt == null) {
+            return null;
+        }
+        return this.createdAt.truncatedTo(ChronoUnit.SECONDS);
     }
 }

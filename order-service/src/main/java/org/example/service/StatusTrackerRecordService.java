@@ -62,7 +62,7 @@ public class StatusTrackerRecordService {
         var trackerRecords = statusTrackerRecordRepository.findAllByOrderIdIn(orderIds);
         var mapOrderIdAndLastStatusRecord = trackerRecords.stream()
                 .collect(Collectors.groupingBy(StatusTrackerRecord::getOrderId,
-                         Collectors.maxBy(Comparator.comparing(StatusTrackerRecord::getTime))));
+                                        Collectors.maxBy(Comparator.comparing(StatusTrackerRecord::getTime))));
 
         var mapResult = new HashMap<String, Status>();
 

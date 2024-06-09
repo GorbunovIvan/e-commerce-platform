@@ -15,4 +15,20 @@ public enum Status {
             return null;
         }
     }
+
+    public static Status nextStatusAfter(Status status) {
+        if (status == null) {
+            return Status.CREATED;
+        }
+        var spotted = false;
+        for (var statusToCheck : Status.values()) {
+            if (spotted) {
+                return statusToCheck;
+            }
+            if (statusToCheck.equals(status)) {
+                spotted = true;
+            }
+        }
+        return null;
+    }
 }

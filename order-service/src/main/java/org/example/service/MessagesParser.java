@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,7 +23,8 @@ public class MessagesParser {
         try {
             log.info("Parsing message from bytes to type {}", clazz.getName());
             return objectMapper.readValue(message, clazz);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            log.error("Parsing message from bytes to type {} failed - {}", clazz.getName(), e.getMessage());
             throw new RuntimeException(e);
         }
     }

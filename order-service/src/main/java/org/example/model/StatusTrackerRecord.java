@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Document(collection = "status-tracker")
 @NoArgsConstructor @AllArgsConstructor
@@ -21,7 +22,17 @@ public class StatusTrackerRecord {
     private String orderId;
 
     private String status;
+
+    @EqualsAndHashCode.Exclude
     private LocalDateTime time;
+
+    @EqualsAndHashCode.Include
+    public LocalDateTime time() {
+        if (this.time == null) {
+            return null;
+        }
+        return this.time.truncatedTo(ChronoUnit.SECONDS);
+    }
 
     @JsonIgnore
     public Status getStatusObj() {
