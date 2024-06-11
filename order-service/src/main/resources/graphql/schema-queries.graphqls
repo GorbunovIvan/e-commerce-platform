@@ -1,10 +1,12 @@
+scalar Long
+
 type Query {
 
     # orders
     getOrderById(id: String): Order
     getAllOrders: [Order]
-    getAllOrdersByUser(userId: Int): [Order]
-    getAllOrdersByProduct(productId: Int): [Order]
+    getAllOrdersByUser(userId: Long): [Order]
+    getAllOrdersByProduct(productId: Long): [Order]
 
     # statuses
     getStatusRecordById(id: String): StatusRecord
@@ -16,8 +18,8 @@ type Query {
 
 type Order {
     id: String
-    userId: Int
-    productId: Int
+    userId: Long
+    productId: Long
     createdAt: String # example - 2024-06-06T12:31:25
     status: String # one of [CREATED, IN_PROGRESS, IN_A_WAY, DELIVERED, DELETED]
 }
