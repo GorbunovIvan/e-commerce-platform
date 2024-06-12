@@ -47,6 +47,10 @@ public class StatusTrackerRecordController {
     @QueryMapping
     public String getCurrentStatusOfOrder(@Argument String orderId) {
         var status = statusTrackerRecordService.getCurrentStatusOfOrder(orderId);
+        if (status == null) {
+            log.warn("No current status of order {} was found", orderId);
+            return null;
+        }
         return status.name();
     }
 }

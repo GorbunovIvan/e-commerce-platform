@@ -37,6 +37,7 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
     testImplementation 'org.springframework.graphql:spring-graphql-test'
+    testImplementation 'org.jeasy:easy-random-core:5.0.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
