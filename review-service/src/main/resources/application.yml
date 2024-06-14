@@ -7,3 +7,7 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/e-commerce-platform-review-service
+
+grpc:
+  server:
+    port: 9090 # default
