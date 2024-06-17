@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(of = { "productId" })
 @ToString
 @Slf4j
 public class ProductAndRatingInfo {
@@ -30,7 +30,7 @@ public class ProductAndRatingInfo {
     }
 
     public static List<ProductAndRatingInfo> reviewsToProductAndRatings(@NotNull List<Review> reviews) {
-        log.info("Converting reviews to ProductAndRatingInfo");
+        log.info("Converting reviews to list of ProductAndRatingInfo");
         var map = reviews.stream()
                 .collect(Collectors.groupingBy(Review::getProductId));
         return map.entrySet().stream()

@@ -14,5 +14,6 @@ public interface ReviewRepository extends MongoRepository<Review, String> {
     List<Review> findAllByUserIdOrderByRatingDesc(@Param("userId") Long userId);
     List<Review> findAllByUserIdInOrderByRatingDesc(@Param("userIds") List<Long> userIds);
 
-    List<Review> findAllByRatingBetweenOrderByRatingDesc(@Param("ratingMin") Integer ratingMin, @Param("ratingMax") Integer ratingMax);
+    List<Review> findAllByRatingBetweenOrderByRatingDesc(@Param("ratingMin") Integer ratingMin,
+                                                         @Param("ratingMax") Integer ratingMax);
 }
