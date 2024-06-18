@@ -9,6 +9,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/notification-service" />
             <option value="$PROJECT_DIR$/product-service" />
             <option value="$PROJECT_DIR$/user-service" />
           </set>
@@ -27,7 +28,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/product-service" />
-            <option value="$PROJECT_DIR$/user-service" />
           </set>
         </option>
       </GradleProjectSettings>
