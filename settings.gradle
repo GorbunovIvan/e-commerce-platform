@@ -1,4 +1,3 @@
 rootProject.name = 'e-commerce-platform'
 
-include('user-service')
-
+include('user-service', 'product-service')
