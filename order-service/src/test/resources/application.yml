@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/e-commerce-platform-order-service-test
+  rabbitmq:
+    host: test
+    dynamic: false
+    topicExchange: test-exchange
+    queues:
+      order-create: order.create.queue
+      order-update: order.update.queue
+      order-change-status: order.change-status.queue
+      order-delete: order.delete.queue
