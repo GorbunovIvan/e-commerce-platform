@@ -2,12 +2,15 @@ package org.example.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.mail.MailSendException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@ConditionalOnProperty(name = "consumer.enabled", havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationConsumer {

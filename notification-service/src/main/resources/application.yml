@@ -21,5 +21,8 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
+consumer:
+  enabled: true
+
 mail:
   receiver: gorbunovvivan@gmail.com
