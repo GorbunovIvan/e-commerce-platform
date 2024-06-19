@@ -20,9 +20,13 @@ public class NotificationConsumer {
             log.info("Consuming: {}", messages);
             notificationService.sendToEmail(messages);
             log.info("Consumed: {}", messages);
+        } catch (MailSendException e) {
+            log.error("Consuming was rolled back due to mail sending errors: {}", messages);
+            throw e;
         } catch (Exception e) {
-            log.error("Consuming failed: {}", messages);
+            log.error("Consuming failed and was rolled back: {}", messages);
             log.error(e.getMessage());
+            throw e;
         }
     }
 }
