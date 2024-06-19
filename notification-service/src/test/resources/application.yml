@@ -1,0 +1,16 @@
+spring:
+
+  kafka:
+    notifications-topic: "notifications-topic"
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test-sender@gmail.com
+    password: "1234 1234 1234 1234"
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+mail:
+  receiver: test-receiver@gmail.com
