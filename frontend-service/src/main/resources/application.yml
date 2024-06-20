@@ -4,3 +4,6 @@ server:
 spring:
   application:
     name: frontend-service
+
+dummy-repositories:
+  enable: true

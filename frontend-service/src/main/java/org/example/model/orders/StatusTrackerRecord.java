@@ -11,6 +11,6 @@ import java.time.LocalDateTime;
 public class StatusTrackerRecord {
     private String id;
     private Order order;
-    private String status;
+    private Status status;
     private LocalDateTime time;
 }
