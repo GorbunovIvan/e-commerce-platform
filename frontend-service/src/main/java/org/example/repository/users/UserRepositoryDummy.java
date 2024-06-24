@@ -34,7 +34,7 @@ public class UserRepositoryDummy implements UserRepository {
         log.info("Searching for user with username={}", username);
         return users.stream()
                 .filter(user -> Objects.equals(user.getUsername(), username))
-                .findFirst()
+                .findAny()
                 .orElse(null);
     }
 
@@ -50,20 +50,24 @@ public class UserRepositoryDummy implements UserRepository {
     @Override
     public synchronized User update(Long id, User user) {
         log.info("Updating user with id={}, {}", id, user);
-        var indexOfUserInList = getIndexOfUserInListById(id);
-        if (indexOfUserInList == -1) {
+        var userExisting = getById(id);
+        if (userExisting == null) {
             log.error("User with id {} not found", id);
             return null;
         }
-        user.setId(id);
-        users.set(indexOfUserInList, user);
-        return user;
+        if (user.getUsername() != null) {
+            userExisting.setUsername(user.getUsername());
+        }
+        return userExisting;
     }
 
     @Override
     public synchronized void deleteById(Long id) {
         log.warn("Deleting user id={}", id);
         var indexOfUserInList = getIndexOfUserInListById(id);
+        if (indexOfUserInList == -1) {
+            return;
+        }
         users.remove(indexOfUserInList);
     }
 

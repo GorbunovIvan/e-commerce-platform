@@ -6,15 +6,15 @@ import org.example.model.products.Product;
 import org.example.model.users.User;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @Slf4j
 public class ProductRepositoryDummy implements ProductRepository {
 
     private final List<Product> products = new ArrayList<>();
+    private final Set<Category> categories = new HashSet<>();
 
     @Override
     public List<Product> getAll(String name, Category category, User user) {
@@ -46,31 +46,68 @@ public class ProductRepositoryDummy implements ProductRepository {
 
     @Override
     public Product create(Product product) {
+
         log.info("Creating product '{}'", product);
+
         var nextId = nextId();
         product.setId(nextId);
+
+        var category = getCategoryOrAddNew(product.getCategory());
+        product.setCategory(category);
+
+        if (product.getCreatedAt() == null) {
+            product.setCreatedAt(LocalDateTime.now());
+        }
+
         products.add(product);
         return product;
     }
 
     @Override
     public synchronized Product update(Long id, Product product) {
+
         log.info("Updating product with id={}, {}", id, product);
-        var indexOfProductInList = getIndexOfProductInListById(id);
-        if (indexOfProductInList == -1) {
+
+        var productExisting = getById(id);
+        if (productExisting == null) {
             log.error("Product with id {} not found", id);
             return null;
         }
-        product.setId(id);
-        products.set(indexOfProductInList, product);
-        return product;
+
+        if (product.getName() != null) {
+            productExisting.setName(product.getName());
+        }
+        if (product.getDescription() != null) {
+            productExisting.setDescription(product.getDescription());
+        }
+        if (product.getCategory() != null) {
+            var category = getCategoryOrAddNew(product.getCategory());
+            productExisting.setCategory(category);
+        }
+        if (product.getUser() != null) {
+            productExisting.setUser(product.getUser());
+        }
+
+        return productExisting;
     }
 
     @Override
     public synchronized void deleteById(Long id) {
         log.warn("Deleting product id={}", id);
         var indexOfProductInList = getIndexOfProductInListById(id);
+        if (indexOfProductInList == -1) {
+            return;
+        }
         products.remove(indexOfProductInList);
+    }
+
+    @Override
+    public Category getCategoryByName(String categoryName) {
+        log.info("Searching for category with name={}", categoryName);
+        return categories.stream()
+                .filter(category -> Objects.equals(category.getName(), categoryName))
+                .findAny()
+                .orElse(null);
     }
 
     private Long nextId() {
@@ -87,5 +124,29 @@ public class ProductRepositoryDummy implements ProductRepository {
             }
         }
         return -1;
+    }
+
+    private Category getCategoryOrAddNew(Category category) {
+
+        if (category == null) {
+            return null;
+        }
+
+        var categoryFound = getCategoryByName(category.getName());
+        if (categoryFound != null) {
+            return categoryFound;
+        }
+
+        log.info("Category with name={} not found, adding new", category.getName());
+
+        var newCategoryId = categories.stream()
+                .mapToInt(Category::getId)
+                .max()
+                .orElse(0) + 1;
+
+        category.setId(newCategoryId);
+
+        categories.add(category);
+        return category;
     }
 }

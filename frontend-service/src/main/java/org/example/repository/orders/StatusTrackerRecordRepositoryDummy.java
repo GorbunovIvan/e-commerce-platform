@@ -31,6 +31,7 @@ public class StatusTrackerRecordRepositoryDummy implements StatusTrackerRecordRe
         return statusTrackerRecords.stream()
                 .filter(order -> order.getOrder() != null)
                 .filter(order -> Objects.equals(order.getOrder().getId(), orderId))
+                .sorted()
                 .toList();
     }
 
@@ -88,6 +89,9 @@ public class StatusTrackerRecordRepositoryDummy implements StatusTrackerRecordRe
         log.info("Creating new status tracker record '{}'", statusTrackerRecord);
         var nextId = nextId();
         statusTrackerRecord.setId(nextId);
+        if (statusTrackerRecord.getTime() == null) {
+            statusTrackerRecord.setTime(LocalDateTime.now());
+        }
         statusTrackerRecords.add(statusTrackerRecord);
         return statusTrackerRecord;
     }
@@ -111,6 +115,9 @@ public class StatusTrackerRecordRepositoryDummy implements StatusTrackerRecordRe
     protected void deleteById(String id) {
         log.warn("Deleting status-record by id={}", id);
         var indexOfStatusRecordInList = getIndexOfStatusRecordInListById(id);
+        if (indexOfStatusRecordInList == -1) {
+            return;
+        }
         statusTrackerRecords.remove(indexOfStatusRecordInList);
     }
 

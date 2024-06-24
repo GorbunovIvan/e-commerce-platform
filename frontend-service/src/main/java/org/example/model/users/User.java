@@ -2,12 +2,25 @@ package org.example.model.users;
 
 import lombok.*;
 
+import java.util.regex.Pattern;
+
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(of = { "username" })
 @ToString
 public class User {
+
     private Long id;
     private String username;
-    public String password;
+
+    public String getUniqueView() {
+        if (getId() == null && getUsername() == null) {
+            return "";
+        }
+        return String.format("%s (id=%s)", getUsername(), getId());
+    }
+
+    public static Pattern patternToReadIdFromUniqueView() {
+        return Pattern.compile(".\\(id=(\\d)\\)$");
+    }
 }

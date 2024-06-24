@@ -6,6 +6,7 @@ import org.example.model.reviews.ProductAndRatingInfo;
 import org.example.model.reviews.Review;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,8 +38,15 @@ public class ReviewRepositoryDummy implements ReviewRepository {
 
         var reviews = getAllByProduct(productId);
 
-        var product = new Product();
-        product.setId(productId);
+        Product product;
+
+        if (reviews.isEmpty()) {
+            product = new Product();
+            product.setId(productId);
+        } else {
+            var firstReview = reviews.getFirst();
+            product = firstReview.getProduct();
+        }
 
         return new ProductAndRatingInfo(product, reviews);
     }
@@ -110,27 +118,47 @@ public class ReviewRepositoryDummy implements ReviewRepository {
         log.info("Creating review '{}'", review);
         var nextId = nextId();
         review.setId(nextId);
+        if (review.getCreatedAt() == null) {
+            review.setCreatedAt(LocalDateTime.now());
+        }
         reviews.add(review);
         return review;
     }
 
     @Override
     public synchronized Review update(String id, Review review) {
+        
         log.info("Updating order with id={}, {}", id, review);
-        var indexOfOrderInList = getIndexOfReviewInListById(id);
-        if (indexOfOrderInList == -1) {
+        
+        var reviewExisting = getById(id);
+        if (reviewExisting == null) {
             log.error("Order with id {} not found", id);
             return null;
         }
-        review.setId(id);
-        reviews.set(indexOfOrderInList, review);
-        return review;
+
+        if (review.getUser() != null) {
+            reviewExisting.setUser(review.getUser());
+        }
+        if (review.getProduct() != null) {
+            reviewExisting.setProduct(review.getProduct());
+        }
+        if (review.getRating() != null) {
+            reviewExisting.setRating(review.getRating());
+        }
+        if (review.getCreatedAt() != null) {
+            reviewExisting.setCreatedAt(review.getCreatedAt());
+        }
+        
+        return reviewExisting;
     }
 
     @Override
     public synchronized void deleteById(String id) {
         log.warn("Deleting review by id={}", id);
         var indexOfOrderInList = getIndexOfReviewInListById(id);
+        if (indexOfOrderInList == -1) {
+            return;
+        }
         reviews.remove(indexOfOrderInList);
     }
 

@@ -2,6 +2,7 @@ package org.example.service.products;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.exception.NotFoundException;
 import org.example.model.products.Category;
 import org.example.model.products.Product;
 import org.example.model.users.User;
@@ -39,7 +40,11 @@ public class ProductService {
 
     public Product update(Long id, Product product) {
         log.info("Updating product with id={}, {}", id, product);
-        return productRepository.update(id, product);
+        var productUpdated = productRepository.update(id, product);
+        if (productUpdated == null) {
+            throw new NotFoundException(String.format("Product with id=%s not found", id));
+        }
+        return productUpdated;
     }
 
     public void deleteById(Long id) {

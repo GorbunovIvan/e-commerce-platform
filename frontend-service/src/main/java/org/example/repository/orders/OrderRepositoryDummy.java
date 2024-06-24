@@ -6,10 +6,8 @@ import org.example.model.orders.Order;
 import org.example.model.orders.Status;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +33,7 @@ public class OrderRepositoryDummy implements OrderRepository {
     public List<Order> getAll() {
         log.info("Searching for all orders");
         var ordersFound = new ArrayList<>(orders);
+        Collections.sort(ordersFound);
         fillCurrentStatusesToOrders(ordersFound);
         return ordersFound;
     }
@@ -45,6 +44,7 @@ public class OrderRepositoryDummy implements OrderRepository {
         var ordersFound = orders.stream()
                 .filter(order -> order.getUser() != null)
                 .filter(order -> Objects.equals(order.getUser().getId(), userId))
+                .sorted()
                 .toList();
         fillCurrentStatusesToOrders(ordersFound);
         return ordersFound;
@@ -56,6 +56,7 @@ public class OrderRepositoryDummy implements OrderRepository {
         var ordersFound = orders.stream()
                 .filter(order -> order.getProduct() != null)
                 .filter(order -> Objects.equals(order.getProduct().getId(), productId))
+                .sorted()
                 .toList();
         fillCurrentStatusesToOrders(ordersFound);
         return ordersFound;
@@ -66,6 +67,9 @@ public class OrderRepositoryDummy implements OrderRepository {
         log.info("Creating order '{}'", order);
         var nextId = nextId();
         order.setId(nextId);
+        if (order.getCreatedAt() == null) {
+            order.setCreatedAt(LocalDateTime.now());
+        }
         orders.add(order);
         statusTrackerRecordRepository.updateStatusForOrder(order, Status.CREATED);
         return order;
@@ -73,16 +77,27 @@ public class OrderRepositoryDummy implements OrderRepository {
 
     @Override
     public synchronized Order update(String id, Order order) {
+
         log.info("Updating order with id={}, {}", id, order);
-        var indexOfOrderInList = getIndexOfOrderInListById(id);
-        if (indexOfOrderInList == -1) {
+
+        var orderExisting = getById(id);
+        if (orderExisting == null) {
             log.error("Order with id {} not found", id);
             return null;
         }
-        order.setId(id);
-        orders.set(indexOfOrderInList, order);
-        fillCurrentStatusToOrder(order);
-        return order;
+
+        if (order.getUser() != null) {
+            orderExisting.setUser(order.getUser());
+        }
+        if (order.getProduct() != null) {
+            orderExisting.setProduct(order.getProduct());
+        }
+        if (order.getCreatedAt() != null) {
+            orderExisting.setCreatedAt(order.getCreatedAt());
+        }
+
+        fillCurrentStatusToOrder(orderExisting);
+        return orderExisting;
     }
 
     @Override
@@ -103,6 +118,9 @@ public class OrderRepositoryDummy implements OrderRepository {
     public synchronized void deleteById(String id) {
         log.warn("Deleting order by id={}", id);
         var indexOfOrderInList = getIndexOfOrderInListById(id);
+        if (indexOfOrderInList == -1) {
+            return;
+        }
         orders.remove(indexOfOrderInList);
     }
 

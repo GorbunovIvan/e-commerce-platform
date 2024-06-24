@@ -2,6 +2,7 @@ package org.example.service.users;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.exception.NotFoundException;
 import org.example.model.users.User;
 import org.example.repository.users.UserRepositoryDummy;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,11 @@ public class UserService {
 
     public User update(Long id, User user) {
         log.info("Updating user with id={}, {}", id, user);
-        return userRepository.update(id, user);
+        var userUpdated = userRepository.update(id, user);
+        if (userUpdated == null) {
+            throw new NotFoundException(String.format("User with id=%s not found", id));
+        }
+        return userUpdated;
     }
 
     public void deleteById(Long id) {

@@ -3,6 +3,7 @@ package org.example.model.reviews;
 import lombok.*;
 import org.example.model.products.Product;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,10 +16,12 @@ public class ProductAndRatingInfo {
     private Product product;
     private Double rating;
     private Integer numberOfReviews;
+    private List<Review> reviews = new ArrayList<>();
 
     public ProductAndRatingInfo(Product product, List<Review> reviews) {
         this.product = product;
         this.numberOfReviews = reviews.size();
+        this.reviews = reviews;
         this.rating = reviews.stream()
                 .mapToInt(Review::getRating)
                 .average()

@@ -46,10 +46,10 @@ public class ApplicationStartupRunnerDummyRepositories implements ApplicationRun
     }
 
     private void fillUserRepository() {
-        userRepository.create(new User(null, "username-1", "password-1"));
-        userRepository.create(new User(null, "username-2", "password-2"));
-        userRepository.create(new User(null, "username-3", "password-3"));
-        userRepository.create(new User(null, "username-4", "password-4"));
+        userRepository.create(new User(null, "username-1"));
+        userRepository.create(new User(null, "username-2"));
+        userRepository.create(new User(null, "username-3"));
+        userRepository.create(new User(null, "username-4"));
     }
 
     private void fillProductRepository() {
@@ -62,13 +62,13 @@ public class ApplicationStartupRunnerDummyRepositories implements ApplicationRun
 
         var users = userRepository.getAll();
 
-        productRepository.create(new Product(null, "name-1", "description-1", categories.get(0), users.get(3), LocalDateTime.now()));
-        productRepository.create(new Product(null, "name-2", "description-2", categories.get(1), users.get(2), LocalDateTime.now()));
-        productRepository.create(new Product(null, "name-3", "description-3", categories.get(2), users.get(1), LocalDateTime.now()));
-        productRepository.create(new Product(null, "name-4", "description-4", categories.get(1), users.get(2), LocalDateTime.now()));
-        productRepository.create(new Product(null, "name-5", "description-5", categories.get(0), users.get(3), LocalDateTime.now()));
-        productRepository.create(new Product(null, "name-6", "description-6", categories.get(2), users.get(1), LocalDateTime.now()));
-        productRepository.create(new Product(null, "name-7", "description-7", categories.get(0), users.get(2), LocalDateTime.now()));
+        productRepository.create(new Product(null, "product-name-1", "description-1", categories.get(0), users.get(3), LocalDateTime.now()));
+        productRepository.create(new Product(null, "product-name-2", "description-2", categories.get(1), users.get(2), LocalDateTime.now()));
+        productRepository.create(new Product(null, "product-name-3", "description-3", categories.get(2), users.get(1), LocalDateTime.now()));
+        productRepository.create(new Product(null, "product-name-4", "description-4", categories.get(1), users.get(2), LocalDateTime.now()));
+        productRepository.create(new Product(null, "product-name-5", "description-5", categories.get(0), users.get(3), LocalDateTime.now()));
+        productRepository.create(new Product(null, "product-name-6", "description-6", categories.get(2), users.get(1), LocalDateTime.now()));
+        productRepository.create(new Product(null, "product-name-7", "description-7", categories.get(0), users.get(2), LocalDateTime.now()));
     }
 
     private void fillReviewRepository() {
@@ -81,7 +81,8 @@ public class ApplicationStartupRunnerDummyRepositories implements ApplicationRun
         for (var product : products) {
             for (var user : users) {
                 var rating = random.nextInt(10) + 1;
-                reviewRepository.create(new Review(null, product, user, rating, LocalDateTime.now()));
+                var createdAt = LocalDateTime.now().plusSeconds(random.nextInt(100_000));
+                reviewRepository.create(new Review(null, product, user, rating, createdAt));
             }
         }
     }
@@ -91,9 +92,12 @@ public class ApplicationStartupRunnerDummyRepositories implements ApplicationRun
         var users = userRepository.getAll();
         var products = productRepository.getAll(null, null, null);
 
+        var random = new Random();
+
         for (var product : products) {
             for (var user : users) {
-                orderRepository.create(new Order(null, user, product, LocalDateTime.now(), null));
+                var createdAt = LocalDateTime.now().plusSeconds(random.nextInt(100_000));
+                orderRepository.create(new Order(null, user, product, createdAt, null));
             }
         }
     }
@@ -109,6 +113,11 @@ public class ApplicationStartupRunnerDummyRepositories implements ApplicationRun
                 var statusIndex = random.nextInt(Status.values().length);
                 var status = Status.values()[statusIndex];
                 orderRepository.changeOrderStatus(order.getId(), status);
+            }
+            var statusRecords = statusTrackerRecordRepository.getAllByOrder(order.getId());
+            for (var statusRecord : statusRecords) {
+                var time = LocalDateTime.now().plusSeconds(random.nextInt(100_000));
+                statusRecord.setTime(time);
             }
         }
     }

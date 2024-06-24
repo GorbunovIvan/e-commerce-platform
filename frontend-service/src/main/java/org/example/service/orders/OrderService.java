@@ -2,11 +2,15 @@ package org.example.service.orders;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.exception.NotFoundException;
 import org.example.model.orders.Order;
 import org.example.model.orders.Status;
+import org.example.model.products.Product;
+import org.example.model.users.User;
 import org.example.repository.orders.OrderRepositoryDummy;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -26,9 +30,23 @@ public class OrderService {
         return orderRepository.getAll();
     }
 
+    public List<Order> getAllByUser(User user) {
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        return this.getAllByUser(user.getId());
+    }
+
     public List<Order> getAllByUser(Long userId) {
         log.info("Searching for orders with userId={}", userId);
         return orderRepository.getAllByUser(userId);
+    }
+
+    public List<Order> getAllByProduct(Product product) {
+        if (product == null) {
+            return Collections.emptyList();
+        }
+        return this.getAllByProduct(product.getId());
     }
 
     public List<Order> getAllByProduct(Long productId) {
@@ -43,7 +61,11 @@ public class OrderService {
 
     public Order update(String id, Order order) {
         log.info("Updating order with id={}, {}", id, order);
-        return orderRepository.update(id, order);
+        var orderUpdated = orderRepository.update(id, order);
+        if (orderUpdated == null) {
+            throw new NotFoundException(String.format("Order with id=%s not found", id));
+        }
+        return orderUpdated;
     }
 
     public Order changeOrderStatus(String id, Status status) {

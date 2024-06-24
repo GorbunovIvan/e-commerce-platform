@@ -2,11 +2,14 @@ package org.example.service.reviews;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.model.products.Product;
 import org.example.model.reviews.ProductAndRatingInfo;
 import org.example.model.reviews.Review;
+import org.example.model.users.User;
 import org.example.repository.reviews.ReviewRepositoryDummy;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -26,6 +29,13 @@ public class ReviewService {
         return reviewRepository.getAll();
     }
 
+    public ProductAndRatingInfo getRatingInfoOfProduct(Product product) {
+        if (product == null) {
+            return new ProductAndRatingInfo();
+        }
+        return getRatingInfoOfProduct(product.getId());
+    }
+
     public ProductAndRatingInfo getRatingInfoOfProduct(Long productId) {
         log.info("Searching for average rating for productId={}", productId);
         return reviewRepository.getRatingInfoOfProduct(productId);
@@ -34,6 +44,13 @@ public class ReviewService {
     public List<ProductAndRatingInfo> getRatingInfoOfProducts(List<Long> productIds) {
         log.info("Searching for average rating for productIds in {}", productIds);
         return reviewRepository.getRatingInfoOfProducts(productIds);
+    }
+
+    public List<Review> getAllByUser(User user) {
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        return this.getAllByUser(user.getId());
     }
 
     public List<Review> getAllByUser(Long userId) {
