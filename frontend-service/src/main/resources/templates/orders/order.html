@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'orders :: ' + ${order.shortInfo()}">Order</title>
+</head>
+<body>
+<div>
+    <div th:insert="~{fragments/menu :: commonMenu}"></div>
+    <h3>Order page</h3>
+    <div>
+        <p>Product: <a th:href="@{/products/__${order.getProductId()}__}" th:text="${order.getProductName()}">product</a></p>
+        <p>by User: <a th:href="@{/users/__${order.getUserId()}__}" th:text="${order.getUserUsername()}">user</a></p>
+        <p>Status: <span th:text="${order.getStatus()}">status</span></p>
+        <p>Created at: <span th:text="${order.getCreatedAt()}">createdAt</span></p>
+    </div>
+    <div>
+        <hr/>
+        <p><a th:href="@{/orders/__${order.getId()}__/edit}">Edit order</a></p>
+        <form th:method="DELETE" th:action="@{/orders/__${order.getId()}__}">
+            <input type="submit" value="Delete order"/>
+        </form>
+    </div>
+    <div>
+        <hr/>
+        <h5>Status history</h5>
+        <div th:each="statusRecord : ${statusHistory}">
+            <p th:text="${statusRecord.shortInfo(false)}">status-info</p>
+        </div>
+        <form method="POST" th:action="@{/orders/__${order.getId()}__/edit-status}">
+            <div>
+                <label for="status">New status</label>
+                <select id="status" name="status">
+                    <option th:each="status : ${statusesAvailable}" th:value="${status}" th:text="${status}" th:selected="${status.equals(order.getStatus()) ? true : false}"></option>
+                </select>
+            </div>
+            <div>
+                <input type="submit" value="Submit status change"/>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

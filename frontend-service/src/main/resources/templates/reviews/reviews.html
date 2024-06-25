@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>reviews</title>
+</head>
+<body>
+<div>
+    <div th:insert="~{fragments/menu :: commonMenu}"></div>
+    <h3>Reviews page</h3>
+    <div>
+        <p><a href="/reviews/new">Add new</a></p>
+    </div>
+    <div>
+        <div th:each="review : ${reviews}">
+            <a th:href="@{/reviews/__${review.getId()}__}" th:text="${review.shortInfo()}">review</a>
+            <br/>
+        </div>
+    </div>
+</div>
+</body>
+</html>

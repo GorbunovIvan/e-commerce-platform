@@ -5,5 +5,10 @@ spring:
   application:
     name: frontend-service
 
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
 dummy-repositories:
   enable: true

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'reviews :: ' + ${review.shortInfo()}">Review</title>
+</head>
+<body>
+<div>
+    <div th:insert="~{fragments/menu :: commonMenu}"></div>
+    <h3>Review page</h3>
+    <div>
+        <p>Product: <a th:href="@{/products/__${review.getProductId()}__}" th:text="${review.getProductName()}">product</a></p>
+        <p>by User: <a th:href="@{/users/__${review.getUserId()}__}" th:text="${review.getUserUsername()}">user</a></p>
+        <p>Rating: <span th:text="${review.getRating()}">rating</span></p>
+        <p>Created at: <span th:text="${review.getCreatedAt()}">createdAt</span></p>
+    </div>
+    <div>
+        <hr/>
+        <p><a th:href="@{/reviews/__${review.getId()}__/edit}">Edit review</a></p>
+        <form th:method="DELETE" th:action="@{/reviews/__${review.getId()}__}">
+            <input type="submit" value="Delete review"/>
+        </form>
+    </div>
+</div>
+</body>
+</html>

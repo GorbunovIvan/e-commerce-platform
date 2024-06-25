@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'orders :: editing status :: ' + ${order.shortInfo()}">Editing order status</title>
+</head>
+<body>
+<div>
+    <div th:insert="~{fragments/menu :: commonMenu}"></div>
+    <h3>Order status editing page</h3>
+    <div>
+        <form method="POST" th:action="@{/orders/__${order.getId()}__/edit-status}">
+            <div>
+                <label for="status">New Status</label>
+                <select id="status" name="status">
+                    <option th:each="status : ${statusesAvailable}" th:value="${status}" th:text="${status}" th:selected="${status.equals(order.getStatus()) ? true : false}"></option>
+                </select>
+            </div>
+            <div>
+                <input type="submit" value="Submit status change"/>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
