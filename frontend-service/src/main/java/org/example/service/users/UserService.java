@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.exception.NotFoundException;
 import org.example.model.users.User;
-import org.example.repository.users.UserRepositoryDummy;
+import org.example.repository.users.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 @Slf4j
 public class UserService {
 
-    private final UserRepositoryDummy userRepository;
+    private final UserRepository userRepository;
 
     public List<User> getAll() {
         log.info("Searching for all users");

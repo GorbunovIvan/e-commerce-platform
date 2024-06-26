@@ -10,5 +10,23 @@ spring:
       filter:
         enabled: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak-user-service:
+            client-id: ${user-service.name}
+            client-secret: SlDu0pPghNiAJ2zo4UzHsp7zy1DVUvbp
+            authorization-grant-type: client_credentials
+            provider: keycloak
+        provider:
+          keycloak:
+            token-uri: http://localhost:8080/realms/e-commerce-platform/protocol/openid-connect/token
+
 dummy-repositories:
   enable: true
+
+user-service:
+  enabled: false
+  name: user-service
+  url: http://localhost:8081/api/v1/users
