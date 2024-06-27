@@ -6,7 +6,7 @@ import org.example.exception.NotFoundException;
 import org.example.model.products.Category;
 import org.example.model.products.Product;
 import org.example.model.users.User;
-import org.example.repository.products.ProductRepositoryDummy;
+import org.example.repository.products.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 public class ProductService {
 
-    private final ProductRepositoryDummy productRepository;
+    private final ProductRepository productRepository;
 
     public List<Product> getAll() {
         log.info("Searching for all products");
@@ -35,6 +35,10 @@ public class ProductService {
 
     public Product create(Product product) {
         log.info("Creating product '{}'", product);
+        if (product.getUser() == null) {
+            //TODO - must be filled with current user
+            product.setUser(new User(999L, null));
+        }
         return productRepository.create(product);
     }
 

@@ -19,6 +19,11 @@ spring:
             client-secret: SlDu0pPghNiAJ2zo4UzHsp7zy1DVUvbp
             authorization-grant-type: client_credentials
             provider: keycloak
+          keycloak-product-service:
+            client-id: ${product-service.name}
+            client-secret: sWdHyl6nx6kKw2WkM6jIf66z2nmgEpos
+            authorization-grant-type: client_credentials
+            provider: keycloak
         provider:
           keycloak:
             token-uri: http://localhost:8080/realms/e-commerce-platform/protocol/openid-connect/token
@@ -30,3 +35,8 @@ user-service:
   enabled: false
   name: user-service
   url: http://localhost:8081/api/v1/users
+
+product-service:
+  enabled: true
+  name: product-service
+  url: http://localhost:8082/api/v1/products
