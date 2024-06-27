@@ -24,7 +24,7 @@ spring:
             token-uri: http://localhost:8080/realms/e-commerce-platform/protocol/openid-connect/token
 
 dummy-repositories:
-  enable: true
+  enabled: true
 
 user-service:
   enabled: false

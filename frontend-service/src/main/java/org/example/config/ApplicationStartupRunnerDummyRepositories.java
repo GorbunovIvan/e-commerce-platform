@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 @Component
-@ConditionalOnProperty(name = "dummy-repositories.enable", havingValue = "true")
+@ConditionalOnProperty(name = "dummy-repositories.enabled", havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j
 public class ApplicationStartupRunnerDummyRepositories implements ApplicationRunner {
