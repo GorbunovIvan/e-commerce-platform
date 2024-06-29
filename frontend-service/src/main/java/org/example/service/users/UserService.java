@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.exception.NotFoundException;
 import org.example.model.users.User;
 import org.example.repository.users.UserRepository;
+import org.example.service.ModelBinder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,25 +16,30 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ModelBinder modelBinder;
 
     public List<User> getAll() {
         log.info("Searching for all users");
-        return userRepository.getAll();
+        var result = userRepository.getAll();
+        return modelBinder.bindFields(result);
     }
 
     public User getById(Long id) {
         log.info("Searching for user with id={}", id);
-        return userRepository.getById(id);
+        var result = userRepository.getById(id);
+        return modelBinder.bindFields(result);
     }
 
     public User getByUsername(String username) {
         log.info("Searching for user with username={}", username);
-        return userRepository.getByUsername(username);
+        var result = userRepository.getByUsername(username);
+        return modelBinder.bindFields(result);
     }
 
     public User create(User user) {
         log.info("Creating user '{}'", user);
-        return userRepository.create(user);
+        var result = userRepository.create(user);
+        return modelBinder.bindFields(result);
     }
 
     public User update(Long id, User user) {
@@ -42,7 +48,7 @@ public class UserService {
         if (userUpdated == null) {
             throw new NotFoundException(String.format("User with id=%s not found", id));
         }
-        return userUpdated;
+        return modelBinder.bindFields(userUpdated);
     }
 
     public void deleteById(Long id) {

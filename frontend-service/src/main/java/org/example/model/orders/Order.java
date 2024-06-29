@@ -1,6 +1,7 @@
 package org.example.model.orders;
 
 import lombok.*;
+import org.example.model.PersistedModel;
 import org.example.model.products.Product;
 import org.example.model.users.User;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,7 +13,7 @@ import java.time.temporal.ChronoUnit;
 @Getter @Setter
 @EqualsAndHashCode(of = { "user", "product", "createdAt" })
 @ToString
-public class Order implements Comparable<Order> {
+public class Order implements PersistedModel<String>, Comparable<Order> {
 
     private String id;
     private User user;
@@ -88,5 +89,10 @@ public class Order implements Comparable<Order> {
             return -1;
         }
         return getCreatedAt().compareTo(o.getCreatedAt());
+    }
+
+    @Override
+    public String getUniqueValueToBindEntitiesFromRemoteServices() {
+        return getId();
     }
 }

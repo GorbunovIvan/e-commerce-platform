@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -27,6 +28,14 @@ public class UserRepositoryDummy implements UserRepository {
                 .filter(user -> Objects.equals(user.getId(), id))
                 .findAny()
                 .orElse(null);
+    }
+
+    @Override
+    public List<User> getByIds(Set<Long> ids) {
+        log.info("Searching for users with ids={}", ids);
+        return users.stream()
+                .filter(user -> ids.contains(user.getId()))
+                .toList();
     }
 
     @Override

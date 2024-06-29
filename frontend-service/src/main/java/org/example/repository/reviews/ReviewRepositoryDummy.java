@@ -26,6 +26,14 @@ public class ReviewRepositoryDummy implements ReviewRepository {
     }
 
     @Override
+    public List<Review> getByIds(Set<String> ids) {
+        log.info("Searching for reviews with ids={}", ids);
+        return reviews.stream()
+                .filter(review -> ids.contains(review.getId()))
+                .toList();
+    }
+
+    @Override
     public List<Review> getAll() {
         log.info("Searching for all reviews");
         return new ArrayList<>(reviews);

@@ -32,7 +32,7 @@ dummy-repositories:
   enabled: true
 
 user-service:
-  enabled: false
+  enabled: true
   name: user-service
   url: http://localhost:8081/api/v1/users
 

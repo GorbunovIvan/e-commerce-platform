@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Primary
@@ -22,6 +23,11 @@ public class UserRepositoryBasedOnFeignClient extends FeignClientBaseClass imple
     private final UserServiceFeignClient userServiceFeignClient;
 
     @Override
+    protected String getServiceName() {
+        return "user-service";
+    }
+
+    @Override
     public List<User> getAll() {
         log.info("Searching for all users");
         return makeARequest(userServiceFeignClient::getAll, Collections::emptyList);
@@ -31,6 +37,12 @@ public class UserRepositoryBasedOnFeignClient extends FeignClientBaseClass imple
     public User getById(Long id) {
         log.info("Searching for user with id={}", id);
         return makeARequest(() -> userServiceFeignClient.getById(id));
+    }
+
+    @Override
+    public List<User> getByIds(Set<Long> ids) {
+        log.info("Searching for users with ids={}", ids);
+        return makeARequest(() -> userServiceFeignClient.getByIds(ids), Collections::emptyList);
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Primary
@@ -25,6 +26,11 @@ public class ProductRepositoryBasedOnFeignClient extends FeignClientBaseClass im
     private final ProductServiceFeignClient productServiceFeignClient;
 
     @Override
+    protected String getServiceName() {
+        return "product-service";
+    }
+
+    @Override
     public List<Product> getAll(String name, Category category, User user) {
         log.info("Searching for all products");
         return makeARequest(() -> productServiceFeignClient.getAll(name, category, user), Collections::emptyList);
@@ -34,6 +40,12 @@ public class ProductRepositoryBasedOnFeignClient extends FeignClientBaseClass im
     public Product getById(Long id) {
         log.info("Searching for product with id={}", id);
         return makeARequest(() -> productServiceFeignClient.getById(id));
+    }
+
+    @Override
+    public List<Product> getByIds(Set<Long> ids) {
+        log.info("Searching for products with ids={}", ids);
+        return makeARequest(() -> productServiceFeignClient.getByIds(ids), Collections::emptyList);
     }
 
     @Override
@@ -60,5 +72,11 @@ public class ProductRepositoryBasedOnFeignClient extends FeignClientBaseClass im
     public Category getCategoryByName(String categoryName) {
         log.info("Searching for category with name={}", categoryName);
         return makeARequest(() -> productServiceFeignClient.getCategoryByName(categoryName));
+    }
+
+    @Override
+    public List<Category> getCategoriesByNames(Set<String> categoryNames) {
+        log.info("Searching for categories with names={}", categoryNames);
+        return makeARequest(() -> productServiceFeignClient.getCategoriesByNames(categoryNames));
     }
 }

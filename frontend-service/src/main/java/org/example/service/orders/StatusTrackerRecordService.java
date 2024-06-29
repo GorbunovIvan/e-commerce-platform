@@ -6,6 +6,7 @@ import org.example.model.orders.Order;
 import org.example.model.orders.Status;
 import org.example.model.orders.StatusTrackerRecord;
 import org.example.repository.orders.StatusTrackerRecordRepositoryDummy;
+import org.example.service.ModelBinder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -17,10 +18,12 @@ import java.util.List;
 public class StatusTrackerRecordService {
 
     private final StatusTrackerRecordRepositoryDummy statusTrackerRecordRepository;
+    private final ModelBinder modelBinder;
 
     public StatusTrackerRecord getById(String id) {
         log.info("Searching for status-record by id={}", id);
-        return statusTrackerRecordRepository.getById(id);
+        var result = statusTrackerRecordRepository.getById(id);
+        return modelBinder.bindFields(result);
     }
 
     public List<StatusTrackerRecord> getAllByOrder(Order order) {
@@ -32,17 +35,20 @@ public class StatusTrackerRecordService {
 
     public List<StatusTrackerRecord> getAllByOrder(String orderId) {
         log.info("Searching for status by orderId={}", orderId);
-        return statusTrackerRecordRepository.getAllByOrder(orderId);
+        var result = statusTrackerRecordRepository.getAllByOrder(orderId);
+        return modelBinder.bindFields(result);
     }
 
     public List<StatusTrackerRecord> getAllCurrentStatuses() {
         log.info("Searching for all current statuses");
-        return statusTrackerRecordRepository.getAllCurrentStatuses();
+        var result = statusTrackerRecordRepository.getAllCurrentStatuses();
+        return modelBinder.bindFields(result);
     }
 
     public List<StatusTrackerRecord> getAllByCurrentStatus(Status status) {
         log.info("Searching for all current status which are '{}'", status);
-        return statusTrackerRecordRepository.getAllByCurrentStatus(status);
+        var result = statusTrackerRecordRepository.getAllByCurrentStatus(status);
+        return modelBinder.bindFields(result);
     }
 
     public Status getCurrentStatusOfOrder(Order order) {
@@ -54,6 +60,7 @@ public class StatusTrackerRecordService {
 
     public Status getCurrentStatusOfOrder(String orderId) {
         log.info("Searching for current status of order={}", orderId);
-        return statusTrackerRecordRepository.getCurrentStatusOfOrder(orderId);
+        var result = statusTrackerRecordRepository.getCurrentStatusOfOrder(orderId);
+        return modelBinder.bindFields(result);
     }
 }

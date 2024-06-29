@@ -1,6 +1,7 @@
 package org.example.model.products;
 
 import lombok.*;
+import org.example.model.PersistedModel;
 import org.example.model.users.User;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,7 @@ import java.util.regex.Pattern;
 @Getter @Setter
 @EqualsAndHashCode(of = { "name", "category", "user", "createdAt" })
 @ToString
-public class Product {
+public class Product implements PersistedModel<Long> {
 
     private Long id;
     private String name;
@@ -54,5 +55,10 @@ public class Product {
 
     public static Pattern patternToReadIdFromUniqueView() {
         return Pattern.compile(".\\(id=(\\d)\\)$");
+    }
+
+    @Override
+    public Long getUniqueValueToBindEntitiesFromRemoteServices() {
+        return getId();
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 @FeignClient(name = "${user-service.name}", url = "${user-service.url}")
@@ -17,6 +18,9 @@ public interface UserServiceFeignClient {
 
     @GetMapping("/{id}")
     ResponseEntity<User> getById(@PathVariable Long id);
+
+    @GetMapping("/ids/{ids}")
+    ResponseEntity<List<User>> getByIds(@PathVariable Collection<Long> ids);
 
     @GetMapping("/username/{username}")
     ResponseEntity<User> getByUsername(@PathVariable String username);

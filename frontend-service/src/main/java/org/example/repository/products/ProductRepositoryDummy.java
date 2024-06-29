@@ -45,6 +45,14 @@ public class ProductRepositoryDummy implements ProductRepository {
     }
 
     @Override
+    public List<Product> getByIds(Set<Long> ids) {
+        log.info("Searching for products with ids={}", ids);
+        return products.stream()
+                .filter(product -> ids.contains(product.getId()))
+                .toList();
+    }
+
+    @Override
     public Product create(Product product) {
 
         log.info("Creating product '{}'", product);
@@ -108,6 +116,14 @@ public class ProductRepositoryDummy implements ProductRepository {
                 .filter(category -> Objects.equals(category.getName(), categoryName))
                 .findAny()
                 .orElse(null);
+    }
+
+    @Override
+    public List<Category> getCategoriesByNames(Set<String> categoryNames) {
+        log.info("Searching for categories with names={}", categoryNames);
+        return categories.stream()
+                .filter(category -> categoryNames.contains(category.getName()))
+                .toList();
     }
 
     private Long nextId() {

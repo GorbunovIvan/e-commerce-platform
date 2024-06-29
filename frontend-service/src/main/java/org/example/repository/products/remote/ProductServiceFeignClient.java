@@ -9,6 +9,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 @FeignClient(name = "${product-service.name}", url = "${product-service.url}")
@@ -23,6 +24,9 @@ public interface ProductServiceFeignClient {
     @GetMapping("/{id}")
     ResponseEntity<Product> getById(@PathVariable Long id);
 
+    @GetMapping("/ids/{ids}")
+    ResponseEntity<List<Product>> getByIds(@PathVariable Collection<Long> ids);
+
     @PostMapping
     ResponseEntity<Product> create(@RequestBody ProductRequestDTO productDTO);
 
@@ -34,4 +38,7 @@ public interface ProductServiceFeignClient {
 
     @GetMapping("/categories/by-name/{categoryName}")
     ResponseEntity<Category> getCategoryByName(@PathVariable String categoryName);
+
+    @GetMapping("/categories/by-names/{categoryNames}")
+    ResponseEntity<List<Category>> getCategoriesByNames(@PathVariable Collection<String> categoryNames);
 }

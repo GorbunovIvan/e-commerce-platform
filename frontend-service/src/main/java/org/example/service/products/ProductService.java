@@ -7,6 +7,7 @@ import org.example.model.products.Category;
 import org.example.model.products.Product;
 import org.example.model.users.User;
 import org.example.repository.products.ProductRepository;
+import org.example.service.ModelBinder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,20 +18,24 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ModelBinder modelBinder;
 
     public List<Product> getAll() {
         log.info("Searching for all products");
-        return productRepository.getAll(null, null, null);
+        var result = productRepository.getAll(null, null, null);
+        return modelBinder.bindFields(result);
     }
 
     public List<Product> getAll(String name, Category category, User user) {
         log.info("Searching for products by params");
-        return productRepository.getAll(name, category, user);
+        var result = productRepository.getAll(name, category, user);
+        return modelBinder.bindFields(result);
     }
 
     public Product getById(Long id) {
         log.info("Searching for product with id={}", id);
-        return productRepository.getById(id);
+        var result = productRepository.getById(id);
+        return modelBinder.bindFields(result);
     }
 
     public Product create(Product product) {
@@ -39,7 +44,8 @@ public class ProductService {
             //TODO - must be filled with current user
             product.setUser(new User(999L, null));
         }
-        return productRepository.create(product);
+        var result = productRepository.create(product);
+        return modelBinder.bindFields(result);
     }
 
     public Product update(Long id, Product product) {
@@ -48,7 +54,7 @@ public class ProductService {
         if (productUpdated == null) {
             throw new NotFoundException(String.format("Product with id=%s not found", id));
         }
-        return productUpdated;
+        return modelBinder.bindFields(productUpdated);
     }
 
     public void deleteById(Long id) {

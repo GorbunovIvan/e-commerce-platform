@@ -1,6 +1,7 @@
 package org.example.model.reviews;
 
 import lombok.*;
+import org.example.model.PersistedModel;
 import org.example.model.products.Product;
 import org.example.model.users.User;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,7 +13,7 @@ import java.time.temporal.ChronoUnit;
 @Getter @Setter
 @EqualsAndHashCode(of = { "product", "user", "createdAt" })
 @ToString
-public class Review {
+public class Review implements PersistedModel<String> {
 
     private String id;
     private Product product;
@@ -76,5 +77,10 @@ public class Review {
                 userView.isEmpty() ? "<no-user>" : userView,
                 createdAtView == null ? "<no-created-at>" : createdAtView.truncatedTo(ChronoUnit.SECONDS),
                 ratingView);
+    }
+
+    @Override
+    public String getUniqueValueToBindEntitiesFromRemoteServices() {
+        return getId();
     }
 }

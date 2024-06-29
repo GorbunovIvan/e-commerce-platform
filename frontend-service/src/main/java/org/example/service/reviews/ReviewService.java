@@ -7,6 +7,7 @@ import org.example.model.reviews.ProductAndRatingInfo;
 import org.example.model.reviews.Review;
 import org.example.model.users.User;
 import org.example.repository.reviews.ReviewRepositoryDummy;
+import org.example.service.ModelBinder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -18,15 +19,18 @@ import java.util.List;
 public class ReviewService {
 
     private final ReviewRepositoryDummy reviewRepository;
+    private final ModelBinder modelBinder;
 
     public Review getById(String id) {
         log.info("Searching for review with id={}", id);
-        return reviewRepository.getById(id);
+        var result = reviewRepository.getById(id);
+        return modelBinder.bindFields(result);
     }
 
     public List<Review> getAll() {
         log.info("Searching for all reviews");
-        return reviewRepository.getAll();
+        var result = reviewRepository.getAll();
+        return modelBinder.bindFields(result);
     }
 
     public ProductAndRatingInfo getRatingInfoOfProduct(Product product) {
@@ -38,12 +42,14 @@ public class ReviewService {
 
     public ProductAndRatingInfo getRatingInfoOfProduct(Long productId) {
         log.info("Searching for average rating for productId={}", productId);
-        return reviewRepository.getRatingInfoOfProduct(productId);
+        var result = reviewRepository.getRatingInfoOfProduct(productId);
+        return modelBinder.bindFields(result);
     }
 
     public List<ProductAndRatingInfo> getRatingInfoOfProducts(List<Long> productIds) {
         log.info("Searching for average rating for productIds in {}", productIds);
-        return reviewRepository.getRatingInfoOfProducts(productIds);
+        var result = reviewRepository.getRatingInfoOfProducts(productIds);
+        return modelBinder.bindFields(result);
     }
 
     public List<Review> getAllByUser(User user) {
@@ -55,27 +61,32 @@ public class ReviewService {
 
     public List<Review> getAllByUser(Long userId) {
         log.info("Searching for reviews with userId={}", userId);
-        return reviewRepository.getAllByUser(userId);
+        var result = reviewRepository.getAllByUser(userId);
+        return modelBinder.bindFields(result);
     }
 
     public List<Review> getAllByUsers(List<Long> userIds) {
         log.info("Searching for reviews with userId in {}", userIds);
-        return reviewRepository.getAllByUsers(userIds);
+        var result = reviewRepository.getAllByUsers(userIds);
+        return modelBinder.bindFields(result);
     }
 
     public List<Review> getAllByRatingBetween(Integer ratingMin, Integer ratingMax) {
         log.info("Searching for reviews by rating between {} - {}", ratingMin, ratingMax);
-        return reviewRepository.getAllByRatingBetween(ratingMin, ratingMax);
+        var result = reviewRepository.getAllByRatingBetween(ratingMin, ratingMax);
+        return modelBinder.bindFields(result);
     }
 
     public Review create(Review review) {
         log.info("Creating review '{}'", review);
-        return reviewRepository.create(review);
+        var result = reviewRepository.create(review);
+        return modelBinder.bindFields(result);
     }
 
     public Review update(String id, Review review) {
         log.info("Updating review with id={}, {}", id, review);
-        return reviewRepository.update(id, review);
+        var result = reviewRepository.update(id, review);
+        return modelBinder.bindFields(result);
     }
 
     public void deleteById(String id) {

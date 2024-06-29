@@ -1,6 +1,7 @@
 package org.example.model.orders;
 
 import lombok.*;
+import org.example.model.PersistedModel;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -9,7 +10,7 @@ import java.time.temporal.ChronoUnit;
 @Getter @Setter
 @EqualsAndHashCode(of = { "order", "status", "time" })
 @ToString
-public class StatusTrackerRecord implements Comparable<StatusTrackerRecord> {
+public class StatusTrackerRecord implements PersistedModel<String>, Comparable<StatusTrackerRecord> {
 
     private String id;
     private Order order;
@@ -50,5 +51,10 @@ public class StatusTrackerRecord implements Comparable<StatusTrackerRecord> {
             return -1;
         }
         return getTime().compareTo(o.getTime());
+    }
+
+    @Override
+    public String getUniqueValueToBindEntitiesFromRemoteServices() {
+        return getId();
     }
 }

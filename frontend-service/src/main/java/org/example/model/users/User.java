@@ -1,6 +1,7 @@
 package org.example.model.users;
 
 import lombok.*;
+import org.example.model.PersistedModel;
 
 import java.util.regex.Pattern;
 
@@ -8,7 +9,7 @@ import java.util.regex.Pattern;
 @Getter @Setter
 @EqualsAndHashCode(of = { "username" })
 @ToString
-public class User {
+public class User implements PersistedModel<Long> {
 
     private Long id;
     private String username;
@@ -22,5 +23,10 @@ public class User {
 
     public static Pattern patternToReadIdFromUniqueView() {
         return Pattern.compile(".\\(id=(\\d)\\)$");
+    }
+
+    @Override
+    public Long getUniqueValueToBindEntitiesFromRemoteServices() {
+        return getId();
     }
 }

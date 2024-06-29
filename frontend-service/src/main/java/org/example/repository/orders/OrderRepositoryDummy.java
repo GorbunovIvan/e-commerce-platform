@@ -30,6 +30,16 @@ public class OrderRepositoryDummy implements OrderRepository {
     }
 
     @Override
+    public List<Order> getByIds(Set<String> ids) {
+        log.info("Searching for orders with ids={}", ids);
+        var ordersFound = orders.stream()
+                .filter(order -> ids.contains(order.getId()))
+                .toList();
+        fillCurrentStatusesToOrders(ordersFound);
+        return ordersFound;
+    }
+
+    @Override
     public List<Order> getAll() {
         log.info("Searching for all orders");
         var ordersFound = new ArrayList<>(orders);

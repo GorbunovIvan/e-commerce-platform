@@ -9,7 +9,9 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 @Slf4j
-public class FeignClientBaseClass {
+public abstract class FeignClientBaseClass {
+
+    protected abstract String getServiceName();
 
     protected <T> T makeARequest(Supplier<ResponseEntity<T>> request) {
         return makeARequest(request, () -> null);
@@ -45,7 +47,9 @@ public class FeignClientBaseClass {
     }
 
     protected void logRemoteServiceError(ResponseEntity<?> response) {
-        var errorTitle = "Remote user-service is not available";
-        log.error("{}. {} - {}", errorTitle, response.getStatusCode(), response.getBody());
+        log.error("Error during performing request to remote service '{}'. {} - {}",
+                getServiceName(),
+                response.getStatusCode(),
+                response.getBody());
     }
 }

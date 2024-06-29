@@ -8,6 +8,7 @@ import org.example.model.orders.Status;
 import org.example.model.products.Product;
 import org.example.model.users.User;
 import org.example.repository.orders.OrderRepositoryDummy;
+import org.example.service.ModelBinder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -19,15 +20,18 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepositoryDummy orderRepository;
+    private final ModelBinder modelBinder;
 
     public Order getById(String id) {
         log.info("Searching for order with id={}", id);
-        return orderRepository.getById(id);
+        var result = orderRepository.getById(id);
+        return modelBinder.bindFields(result);
     }
 
     public List<Order> getAll() {
         log.info("Searching for all orders");
-        return orderRepository.getAll();
+        var result = orderRepository.getAll();
+        return modelBinder.bindFields(result);
     }
 
     public List<Order> getAllByUser(User user) {
@@ -39,7 +43,8 @@ public class OrderService {
 
     public List<Order> getAllByUser(Long userId) {
         log.info("Searching for orders with userId={}", userId);
-        return orderRepository.getAllByUser(userId);
+        var result = orderRepository.getAllByUser(userId);
+        return modelBinder.bindFields(result);
     }
 
     public List<Order> getAllByProduct(Product product) {
@@ -51,12 +56,14 @@ public class OrderService {
 
     public List<Order> getAllByProduct(Long productId) {
         log.info("Searching for orders with productId={}", productId);
-        return orderRepository.getAllByProduct(productId);
+        var result = orderRepository.getAllByProduct(productId);
+        return modelBinder.bindFields(result);
     }
 
     public Order create(Order order) {
         log.info("Creating order '{}'", order);
-        return orderRepository.create(order);
+        var result = orderRepository.create(order);
+        return modelBinder.bindFields(result);
     }
 
     public Order update(String id, Order order) {
@@ -65,12 +72,13 @@ public class OrderService {
         if (orderUpdated == null) {
             throw new NotFoundException(String.format("Order with id=%s not found", id));
         }
-        return orderUpdated;
+        return modelBinder.bindFields(orderUpdated);
     }
 
     public Order changeOrderStatus(String id, Status status) {
         log.info("Updating status for order with id={}, new status={}", id, status);
-        return orderRepository.changeOrderStatus(id, status);
+        var result = orderRepository.changeOrderStatus(id, status);
+        return modelBinder.bindFields(result);
     }
 
     public void deleteById(String id) {

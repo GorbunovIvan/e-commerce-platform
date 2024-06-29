@@ -26,6 +26,14 @@ public class StatusTrackerRecordRepositoryDummy implements StatusTrackerRecordRe
     }
 
     @Override
+    public List<StatusTrackerRecord> getByIds(Set<String> ids) {
+        log.info("Searching for status-records by ids={}", ids);
+        return statusTrackerRecords.stream()
+                .filter(order -> ids.contains(order.getId()))
+                .toList();
+    }
+
+    @Override
     public List<StatusTrackerRecord> getAllByOrder(String orderId) {
         log.info("Searching for status by orderId={}", orderId);
         return statusTrackerRecords.stream()
