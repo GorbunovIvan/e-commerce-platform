@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.model.orders.Order;
 import org.example.model.orders.Status;
 import org.example.model.orders.StatusTrackerRecord;
-import org.example.repository.orders.StatusTrackerRecordRepositoryDummy;
+import org.example.repository.orders.StatusTrackerRecordRepository;
 import org.example.service.ModelBinder;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 public class StatusTrackerRecordService {
 
-    private final StatusTrackerRecordRepositoryDummy statusTrackerRecordRepository;
+    private final StatusTrackerRecordRepository statusTrackerRecordRepository;
     private final ModelBinder modelBinder;
 
     public StatusTrackerRecord getById(String id) {

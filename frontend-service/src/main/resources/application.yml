@@ -32,11 +32,15 @@ dummy-repositories:
   enabled: true
 
 user-service:
-  enabled: true
+  enabled: false
   name: user-service
   url: http://localhost:8081/api/v1/users
 
 product-service:
-  enabled: true
+  enabled: false
   name: product-service
   url: http://localhost:8082/api/v1/products
+
+order-service:
+  enabled: true
+  graphql-url: http://localhost:8083/graphql

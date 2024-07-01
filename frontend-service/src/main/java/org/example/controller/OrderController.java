@@ -53,6 +53,9 @@ public class OrderController {
     @PostMapping
     public String create(@ModelAttribute Order order) {
         var orderCreated = orderService.create(order);
+        if (orderCreated == null) { // In the case of asynchronous creation
+            return "redirect:/orders";
+        }
         return "redirect:/orders/" + orderCreated.getId();
     }
 
