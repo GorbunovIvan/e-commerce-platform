@@ -18,7 +18,7 @@ import java.util.Set;
 public class OrderRepositoryFacade implements OrderRepository {
 
     private final OrderRepositoryGraphQL orderRepositoryGraphQL;
-    private final OrderRepositoryRabbitMQ orderRepositoryRabbitMQ;
+    private final OrderRepositoryRabbitMQPublisher orderRepositoryRabbitMQ;
 
     @Override
     public Order getById(String id) {

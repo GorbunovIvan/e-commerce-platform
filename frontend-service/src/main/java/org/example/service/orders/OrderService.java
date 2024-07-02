@@ -69,6 +69,13 @@ public class OrderService {
     public Order update(String id, Order order) {
         log.info("Updating order with id={}, {}", id, order);
         var orderUpdated = orderRepository.update(id, order);
+        // In the case of asynchronous creation
+        if (orderUpdated == null) {
+            orderUpdated = getById(id);
+            if (orderUpdated != null) {
+                return orderUpdated;
+            }
+        }
         if (orderUpdated == null) {
             throw new NotFoundException(String.format("Order with id=%s not found", id));
         }
