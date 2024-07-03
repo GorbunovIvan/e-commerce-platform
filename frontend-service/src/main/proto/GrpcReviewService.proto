@@ -1,0 +1,78 @@
+syntax = "proto3";
+package org.example.grpc;
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service GrpcReviewService {
+  rpc getById(IdRequest) returns(ReviewResponse);
+  rpc getByIds(IdsRequest) returns(ReviewsResponse);
+  rpc getAll(google.protobuf.Empty) returns(ReviewsResponse);
+  rpc getRatingInfoOfProduct(IdNumberRequest) returns(ProductAndRatingInfoResponse);
+  rpc getRatingInfoOfProducts(IdNumbersRequest) returns(ProductAndRatingInfoListResponse);
+  rpc getAllByUser(IdNumberRequest) returns(ReviewsResponse);
+  rpc getAllByUsers(IdNumbersRequest) returns(ReviewsResponse);
+  rpc getAllByRatingBetween(RatingRangeRequest) returns(ReviewsResponse);
+  rpc create(ReviewRequest) returns(ReviewResponse);
+  rpc update(UpdateReviewRequest) returns(ReviewResponse);
+  rpc deleteById(IdRequest) returns(google.protobuf.Empty);
+}
+
+message ReviewRequest {
+  int64 productId = 1;
+  int64 userId = 2;
+  int32 rating = 3;
+  google.protobuf.Timestamp createdAt = 4;
+}
+
+message ReviewResponse {
+  string id = 1;
+  int64 productId = 2;
+  int64 userId = 3;
+  int32 rating = 4;
+  google.protobuf.Timestamp createdAt = 5;
+}
+
+message ReviewsResponse {
+  repeated ReviewResponse reviews = 1;
+}
+
+message ProductAndRatingInfoResponse {
+  int64 productId = 1;
+  double rating = 2;
+  int32 numberOfReviews = 3;
+  repeated ReviewResponse reviews = 4;
+}
+
+message ProductAndRatingInfoListResponse {
+  repeated ProductAndRatingInfoResponse productsInfo = 1;
+}
+
+message IdRequest {
+  string id = 1;
+}
+
+message IdsRequest {
+  repeated IdRequest ids = 1;
+}
+
+message IdNumberRequest {
+  uint64 id = 1;
+}
+
+message IdNumbersRequest {
+  repeated IdNumberRequest ids = 1;
+}
+
+message RatingRangeRequest {
+  int32 ratingMin = 1;
+  int32 ratingMax = 2;
+}
+
+message UpdateReviewRequest {
+  string id = 1;
+  ReviewRequest review = 2;
+}
+
+// For gradle - "clean", and then "assemble" to generate classes in the "build" directory

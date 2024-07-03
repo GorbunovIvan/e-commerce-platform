@@ -28,6 +28,13 @@ public class ProductAndRatingInfo {
                 .orElse(-1D);
     }
 
+    public Long getProductId() {
+        if (this.product == null) {
+            return null;
+        }
+        return this.product.getId();
+    }
+
     public static List<ProductAndRatingInfo> reviewsToProductAndRatings(List<Review> reviews) {
         var mapByProduct = reviews.stream()
                 .collect(Collectors.groupingBy(Review::getProduct));

@@ -51,5 +51,11 @@ product-service:
   url: http://localhost:8082/api/v1/products
 
 order-service:
-  enabled: true
+  enabled: false
   graphql-url: http://localhost:8083/graphql
+
+review-service:
+  enabled: true
+  grpc:
+    host: localhost
+    port: 9090

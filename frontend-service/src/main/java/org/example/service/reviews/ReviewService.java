@@ -6,10 +6,11 @@ import org.example.model.products.Product;
 import org.example.model.reviews.ProductAndRatingInfo;
 import org.example.model.reviews.Review;
 import org.example.model.users.User;
-import org.example.repository.reviews.ReviewRepositoryDummy;
+import org.example.repository.reviews.ReviewRepository;
 import org.example.service.ModelBinder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
 @Slf4j
 public class ReviewService {
 
-    private final ReviewRepositoryDummy reviewRepository;
+    private final ReviewRepository reviewRepository;
     private final ModelBinder modelBinder;
 
     public Review getById(String id) {
@@ -79,6 +80,9 @@ public class ReviewService {
 
     public Review create(Review review) {
         log.info("Creating review '{}'", review);
+        if (review.getCreatedAt() == null) {
+            review.setCreatedAt(LocalDateTime.now());
+        }
         var result = reviewRepository.create(review);
         return modelBinder.bindFields(result);
     }
