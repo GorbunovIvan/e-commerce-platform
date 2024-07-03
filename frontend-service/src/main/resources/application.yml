@@ -55,7 +55,7 @@ order-service:
   graphql-url: http://localhost:8083/graphql
 
 review-service:
-  enabled: true
+  enabled: false
   grpc:
     host: localhost
     port: 9090

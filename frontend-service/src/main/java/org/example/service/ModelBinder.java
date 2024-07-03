@@ -43,7 +43,7 @@ public class ModelBinder {
             return (T) bindFieldsOfEntitiesOfCollection(collection);
         }
 
-        var fields = getAllFields(entity.getClass());
+        var fields = getFieldsToBind(entity.getClass());
 
         for (var field : fields) {
 
@@ -62,6 +62,9 @@ public class ModelBinder {
                         log.warn("No entity found by reference '{}' - {}", uniqueValue, valueOfField);
                     }
                     field.set(entity, modelFound);
+                } else if (valueOfField instanceof Collection<?> collectionOfModels) {
+                    var collectionOfModelsBound = bindFieldsOfEntitiesOfCollection(collectionOfModels);
+                    field.set(entity, collectionOfModelsBound);
                 }
             } catch (Exception e) {
                 log.error("Failed to bind model to field '{}' - {}", field.getName(), e.getMessage());
@@ -82,18 +85,18 @@ public class ModelBinder {
         }
 
         var element = collection.iterator().next();
-        var fields = getAllFields(element.getClass());
+        var fields = getFieldsToBind(element.getClass());
 
         for (var field : fields) {
 
             log.info("Binding field '{}' of entities {} to model by reference", field.getName(), collection);
 
             var isAccessible = field.isAccessible();
-            if (!isAccessible) {
-                field.trySetAccessible();
-            }
 
             try {
+                if (!isAccessible) {
+                    field.trySetAccessible();
+                }
 
                 var modelsToBind = new ArrayList<PersistedModel<?>>();
 
@@ -192,19 +195,25 @@ public class ModelBinder {
         }
     }
 
-    private List<Field> getAllFields(Class<?> clazz) {
+    private List<Field> getFieldsToBind(Class<?> clazz) {
 
         if (clazz == null) {
             return Collections.emptyList();
         }
 
         // Recursion to add all fields of superclasses
-        List<Field> result = new ArrayList<>(getAllFields(clazz.getSuperclass()));
+        List<Field> result = new ArrayList<>(getFieldsToBind(clazz.getSuperclass()));
 
-        List<Field> filteredFields = Arrays.stream(clazz.getDeclaredFields())
+        var fieldsWithEntities = Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> PersistedModel.class.isAssignableFrom(field.getType())) // We only need fields whose type is a child of PersistedModel
                 .toList();
-        result.addAll(filteredFields);
+        result.addAll(fieldsWithEntities);
+
+        // We also take all collection fields
+        var fieldsWithCollection = Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> Collection.class.isAssignableFrom(field.getType()))
+                .toList();
+        result.addAll(fieldsWithCollection);
 
         return result;
     }
