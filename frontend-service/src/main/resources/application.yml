@@ -37,6 +37,9 @@ spring:
       order-change-status: order.change-status.queue
       order-delete: order.delete.queue
 
+  kafka:
+    notifications-topic: "notifications-topic"
+
 dummy-repositories:
   enabled: true
 
@@ -59,3 +62,6 @@ review-service:
   grpc:
     host: localhost
     port: 9090
+
+notification-service:
+  enabled: true

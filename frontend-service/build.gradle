@@ -59,6 +59,9 @@ dependencies {
     implementation "io.grpc:grpc-all:${ioGrpcVersion}"
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
 
+//    Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
