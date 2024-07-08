@@ -64,4 +64,4 @@ review-service:
     port: 9090
 
 notification-service:
-  enabled: true
+  enabled: false

@@ -16,16 +16,13 @@ public class ProductAndRatingInfo {
     private Product product;
     private Double rating;
     private Integer numberOfReviews;
+
+    @Setter(AccessLevel.NONE)
     private List<Review> reviews = new ArrayList<>();
 
     public ProductAndRatingInfo(Product product, List<Review> reviews) {
         this.product = product;
-        this.numberOfReviews = reviews.size();
-        this.reviews = reviews;
-        this.rating = reviews.stream()
-                .mapToInt(Review::getRating)
-                .average()
-                .orElse(-1D);
+        this.setReviews(reviews);
     }
 
     public Long getProductId() {
@@ -33,6 +30,16 @@ public class ProductAndRatingInfo {
             return null;
         }
         return this.product.getId();
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = new ArrayList<>(reviews);
+        this.numberOfReviews = reviews.size();
+        this.rating = reviews.stream()
+                .filter(review -> review.getRating() != null)
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(-1D);
     }
 
     public static List<ProductAndRatingInfo> reviewsToProductAndRatings(List<Review> reviews) {

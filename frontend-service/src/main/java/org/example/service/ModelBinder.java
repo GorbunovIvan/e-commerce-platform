@@ -63,7 +63,7 @@ public class ModelBinder {
                     }
                     field.set(entity, modelFound);
                 } else if (valueOfField instanceof Collection<?> collectionOfModels) {
-                    var collectionOfModelsBound = bindFieldsOfEntitiesOfCollection(collectionOfModels);
+                    var collectionOfModelsBound = bindFieldsOfEntitiesOfCollection(collectionOfModels, false);
                     field.set(entity, collectionOfModelsBound);
                 }
             } catch (Exception e) {
@@ -79,13 +79,30 @@ public class ModelBinder {
     }
 
     private Collection<?> bindFieldsOfEntitiesOfCollection(Collection<?> collection) {
+        return bindFieldsOfEntitiesOfCollection(collection, true);
+    }
+
+    private Collection<?> bindFieldsOfEntitiesOfCollection(Collection<?> collection, boolean onlyNestedFields) {
 
         if (collection.isEmpty()) {
             return collection;
         }
 
-        var element = collection.iterator().next();
-        var fields = getFieldsToBind(element.getClass());
+        var firstElement = collection.iterator().next();
+
+        if (!onlyNestedFields) {
+            if (firstElement instanceof PersistedModel<?>) {
+                @SuppressWarnings("unchecked")
+                var collectionOfModels = (Collection<PersistedModel<?>>) collection;
+                var listOfModels = (List<PersistedModel<?>>) new ArrayList<>(collectionOfModels);
+                @SuppressWarnings("unchecked")
+                var collectionOfModelsBound = (Collection<PersistedModel<?>>) getObjectsByReferences(listOfModels);
+                collectionOfModels.clear();
+                collectionOfModels.addAll(collectionOfModelsBound);
+            }
+        }
+
+        var fields = getFieldsToBind(firstElement.getClass());
 
         for (var field : fields) {
 
