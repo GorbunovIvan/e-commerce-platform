@@ -1,4 +1,4 @@
-package org.example.service;
+package org.example.service.modelsBinding;
 
 import org.example.model.orders.Order;
 import org.example.model.orders.StatusTrackerRecord;
@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.never;
 
 @SpringBootTest
 class ModelBinderTest {

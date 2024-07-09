@@ -13,7 +13,7 @@ public class Category implements PersistedModel<String> {
     private String name;
 
     @Override
-    public String getUniqueValueToBindEntitiesFromRemoteServices() {
+    public String getUniqueIdentifierForBindingWithOtherServices() {
         return getName();
     }
 }

@@ -54,7 +54,7 @@ public class StatusTrackerRecord implements PersistedModel<String>, Comparable<S
     }
 
     @Override
-    public String getUniqueValueToBindEntitiesFromRemoteServices() {
+    public String getUniqueIdentifierForBindingWithOtherServices() {
         return getId();
     }
 }

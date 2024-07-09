@@ -80,7 +80,7 @@ public class Review implements PersistedModel<String> {
     }
 
     @Override
-    public String getUniqueValueToBindEntitiesFromRemoteServices() {
+    public String getUniqueIdentifierForBindingWithOtherServices() {
         return getId();
     }
 }

@@ -26,7 +26,7 @@ public class User implements PersistedModel<Long> {
     }
 
     @Override
-    public Long getUniqueValueToBindEntitiesFromRemoteServices() {
+    public Long getUniqueIdentifierForBindingWithOtherServices() {
         return getId();
     }
 }

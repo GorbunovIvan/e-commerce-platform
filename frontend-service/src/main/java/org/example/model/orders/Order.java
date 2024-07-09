@@ -92,7 +92,7 @@ public class Order implements PersistedModel<String>, Comparable<Order> {
     }
 
     @Override
-    public String getUniqueValueToBindEntitiesFromRemoteServices() {
+    public String getUniqueIdentifierForBindingWithOtherServices() {
         return getId();
     }
 }

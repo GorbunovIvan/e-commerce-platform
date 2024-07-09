@@ -7,7 +7,7 @@ import org.example.model.reviews.ProductAndRatingInfo;
 import org.example.model.reviews.Review;
 import org.example.model.users.User;
 import org.example.repository.reviews.ReviewRepository;
-import org.example.service.ModelBinder;
+import org.example.service.modelsBinding.ModelBinder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

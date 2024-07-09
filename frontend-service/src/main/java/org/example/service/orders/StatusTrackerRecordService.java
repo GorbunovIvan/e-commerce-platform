@@ -6,7 +6,7 @@ import org.example.model.orders.Order;
 import org.example.model.orders.Status;
 import org.example.model.orders.StatusTrackerRecord;
 import org.example.repository.orders.StatusTrackerRecordRepository;
-import org.example.service.ModelBinder;
+import org.example.service.modelsBinding.ModelBinder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;

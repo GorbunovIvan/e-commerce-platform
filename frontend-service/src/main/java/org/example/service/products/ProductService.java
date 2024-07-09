@@ -7,7 +7,7 @@ import org.example.model.products.Category;
 import org.example.model.products.Product;
 import org.example.model.users.User;
 import org.example.repository.products.ProductRepository;
-import org.example.service.ModelBinder;
+import org.example.service.modelsBinding.ModelBinder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.exception.NotFoundException;
 import org.example.model.users.User;
 import org.example.repository.users.UserRepository;
-import org.example.service.ModelBinder;
+import org.example.service.modelsBinding.ModelBinder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

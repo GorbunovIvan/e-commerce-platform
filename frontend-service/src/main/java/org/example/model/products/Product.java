@@ -58,7 +58,7 @@ public class Product implements PersistedModel<Long> {
     }
 
     @Override
-    public Long getUniqueValueToBindEntitiesFromRemoteServices() {
+    public Long getUniqueIdentifierForBindingWithOtherServices() {
         return getId();
     }
 }

@@ -8,7 +8,7 @@ import org.example.model.orders.Status;
 import org.example.model.products.Product;
 import org.example.model.users.User;
 import org.example.repository.orders.OrderRepository;
-import org.example.service.ModelBinder;
+import org.example.service.modelsBinding.ModelBinder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
