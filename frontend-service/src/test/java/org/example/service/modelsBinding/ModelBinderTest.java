@@ -45,6 +45,13 @@ class ModelBinderTest {
 
     private final EasyRandom easyRandom = new EasyRandom();
 
+    // Miscellaneous cases
+    @Test
+    void shouldReturnNullWhenBindFields() {
+        var result = modelBinder.bindFields(null);
+        assertNull(result);
+    }
+
     // Users
     @Test
     void shouldBindFieldsOfUserWhenBindFields() {
@@ -537,6 +544,7 @@ class ModelBinderTest {
         verify(reviewRepository, never()).getByIds(reviewsIds);
         verify(reviewRepository, never()).getById(anyString());
     }
+
 
     private User copyUser(User user) {
         return new User(user.getId(), user.getUsername());
