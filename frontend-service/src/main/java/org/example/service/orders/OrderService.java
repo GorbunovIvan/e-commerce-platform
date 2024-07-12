@@ -69,7 +69,7 @@ public class OrderService {
     public Order update(String id, Order order) {
         log.info("Updating order with id={}, {}", id, order);
         var orderUpdated = orderRepository.update(id, order);
-        // In the case of asynchronous creation
+        // In case of asynchronous creation (e.g. via a message-broker)
         if (orderUpdated == null) {
             orderUpdated = getById(id);
             if (orderUpdated != null) {
