@@ -49,7 +49,7 @@ public abstract class FeignClientBaseClass {
     protected void logRemoteServiceError(ResponseEntity<?> response) {
         log.error("Error during performing request to remote service '{}'. {} - {}",
                 getServiceName(),
-                response.getStatusCode(),
-                response.getBody());
+                response == null ? "<no response status>" : response.getStatusCode(),
+                response == null ? "<no response body>" : response.getBody());
     }
 }
