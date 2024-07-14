@@ -47,6 +47,9 @@ public class OrderRepositoryGraphQL {
 
         try {
             var orderDTO = responseFuture.get();
+            if (orderDTO == null) {
+                return null;
+            }
             return orderDTO.toOrder();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Failed to get order by id - {}", e.getMessage());

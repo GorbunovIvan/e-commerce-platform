@@ -51,6 +51,9 @@ public class StatusTrackerRecordRepositoryGraphQL implements StatusTrackerRecord
 
         try {
             var statusRecordDTO = responseFuture.get();
+            if (statusRecordDTO == null) {
+                return null;
+            }
             return statusRecordDTO.toStatusTrackerRecord();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Failed to get status-record by id - {}", e.getMessage());

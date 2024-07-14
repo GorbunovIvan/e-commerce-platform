@@ -183,15 +183,13 @@ class StatusTrackerRecordServiceTest {
     void shouldReturnNullWhenGetCurrentStatusOfOrder() {
 
         var order = easyRandom.nextObject(Order.class);
-        var status = Status.IN_PROGRESS;
 
-        when(statusTrackerRecordRepository.getCurrentStatusOfOrder(order.getId())).thenReturn(status);
+        when(statusTrackerRecordRepository.getCurrentStatusOfOrder(order.getId())).thenReturn(null);
 
         var statusReceived = statusTrackerRecordService.getCurrentStatusOfOrder(order);
-        assertNotNull(statusReceived);
-        assertEquals(status, statusReceived);
+        assertNull(statusReceived);
 
         verify(statusTrackerRecordRepository, times(1)).getCurrentStatusOfOrder(order.getId());
-        verify(modelBinder, times(1)).bindFields(status);
+        verify(modelBinder, times(1)).bindFields(null);
     }
 }
