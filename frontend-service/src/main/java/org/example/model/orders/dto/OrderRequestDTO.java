@@ -11,6 +11,7 @@ import java.util.List;
 
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter
+@EqualsAndHashCode
 @ToString
 public class OrderRequestDTO {
 
