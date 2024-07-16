@@ -75,6 +75,12 @@ public class ReviewsUtil {
                 .collect(Collectors.toList());
     }
 
+    public ReviewsResponse toReviewsResponse(@NotNull List<Review> reviews) {
+        return ReviewsResponse.newBuilder()
+                .addAllReviews(toReviewsResponses(reviews))
+                .build();
+    }
+
     public ProductAndRatingInfoResponse toProductAndRatingInfoResponse(@NotNull ProductAndRatingInfo productAndRatingInfo) {
         return ProductAndRatingInfoResponse.newBuilder()
                 .setProductId(productAndRatingInfo.getProductId())
@@ -88,6 +94,12 @@ public class ReviewsUtil {
         return productAndRatingInfoList.stream()
                 .map(this::toProductAndRatingInfoResponse)
                 .collect(Collectors.toList());
+    }
+
+    public ProductAndRatingInfoListResponse toProductAndRatingInfoListResponse(@NotNull List<ProductAndRatingInfo> productAndRatingInfoList) {
+        return ProductAndRatingInfoListResponse.newBuilder()
+                .addAllProductsInfo(toProductAndRatingInfoResponses(productAndRatingInfoList))
+                .build();
     }
 
     public ProductAndRatingInfo toProductAndRatingInfo(@NotNull ProductAndRatingInfoResponse productAndRatingInfoResponse) {
