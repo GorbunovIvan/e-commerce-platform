@@ -75,6 +75,7 @@ public class UserRepositoryDummy implements UserRepository {
         log.warn("Deleting user id={}", id);
         var indexOfUserInList = getIndexOfUserInListById(id);
         if (indexOfUserInList == -1) {
+            log.error("User with id {} not found in attempt to delete user", id);
             return;
         }
         users.remove(indexOfUserInList);
