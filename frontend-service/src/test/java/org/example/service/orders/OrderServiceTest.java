@@ -231,7 +231,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void shouldReturnNullWhenChangeOrderStatus() {
+    void shouldReturnOrderWhenChangeOrderStatus() {
 
         var order = easyRandom.nextObject(Order.class);
         var id = order.getId();

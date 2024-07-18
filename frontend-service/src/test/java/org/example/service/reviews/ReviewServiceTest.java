@@ -337,7 +337,7 @@ class ReviewServiceTest {
     }
 
     @Test
-    void shouldReturnReviewWhenDeleteById() {
+    void shouldDeleteReviewWhenDeleteById() {
         var id = "987";
         reviewService.deleteById(id);
         verify(reviewRepository, times(1)).deleteById(id);
