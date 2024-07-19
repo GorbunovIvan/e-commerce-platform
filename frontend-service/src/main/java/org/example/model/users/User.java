@@ -22,7 +22,7 @@ public class User implements PersistedModel<Long> {
     }
 
     public static Pattern patternToReadIdFromUniqueView() {
-        return Pattern.compile(".\\(id=(\\d)\\)$");
+        return Pattern.compile(".*\\(id=(\\d+)\\)$");
     }
 
     @Override

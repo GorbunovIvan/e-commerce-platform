@@ -9,15 +9,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ExceptionHandlerControllerAdvice {
 
     @ExceptionHandler
-    private String handleException(Exception e, Model model) {
+    String handleException(Exception e, Model model) {
         var message = getMessageFromException(e);
-        model.addAttribute("title", "Error: " + message.substring(0, 20));
+        model.addAttribute("title", "Error: " + message.substring(0, Math.min(20, message.length())));
         model.addAttribute("message", message);
         return "error";
     }
 
     @ExceptionHandler(NotFoundException.class)
-    private String handleNotFoundExceptionException(NotFoundException e, Model model) {
+    String handleNotFoundException(NotFoundException e, Model model) {
         var message = getMessageFromException(e);
         model.addAttribute("title", e.getTitle());
         model.addAttribute("message", message);
@@ -26,9 +26,17 @@ public class ExceptionHandlerControllerAdvice {
 
     private String getMessageFromException(Exception e) {
         var message = e.getMessage();
-        if (message.isEmpty()) {
-            message = e.getCause().toString();
+        if (message != null && !message.isEmpty()) {
+            return message;
         }
-        return message;
+        var cause = e.getCause();
+        if (cause != null) {
+            var causeMessage = cause.getMessage();
+            if (causeMessage != null && !causeMessage.isEmpty()) {
+                return causeMessage;
+            }
+            return cause.toString();
+        }
+        return "";
     }
 }
