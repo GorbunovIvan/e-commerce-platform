@@ -1,5 +1,7 @@
 server:
   port: 8086
+  #  url: ${spring.application.name}:${server.port}
+  url: http://localhost:${server.port}
 
 spring:
   application:
@@ -14,6 +16,11 @@ spring:
     oauth2:
       client:
         registration:
+          keycloak-web:
+            client-id: ${spring.application.name}
+            client-secret: 2RxH0f65UDNTflahILc9mW1c3KQmnqe8
+            scope: openid, profile
+            authorization-grant-type: authorization_code
           keycloak-user-service:
             client-id: ${user-service.name}
             client-secret: SlDu0pPghNiAJ2zo4UzHsp7zy1DVUvbp
@@ -26,7 +33,10 @@ spring:
             provider: keycloak
         provider:
           keycloak:
-            token-uri: http://localhost:8080/realms/e-commerce-platform/protocol/openid-connect/token
+            token-uri: ${keycloak.server-url}/realms/${keycloak.realm}/protocol/openid-connect/token
+          keycloak-web:
+            issuer-uri: ${keycloak.server-url}/realms/${keycloak.realm}
+            user-name-attribute: preferred_username
 
   rabbitmq:
     host: localhost
@@ -39,6 +49,11 @@ spring:
 
   kafka:
     notifications-topic: "notifications-topic"
+
+keycloak:
+  server-url: http://localhost:8080
+  realm: e-commerce-platform
+  web-registration-name: "keycloak-web" # taken from "security.oauth2.client.registration.<>"
 
 dummy-repositories:
   enabled: true

@@ -62,6 +62,10 @@ dependencies {
 //    Kafka
     implementation 'org.springframework.kafka:spring-kafka'
 
+//    Keycloak (for web-form authorization)
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.keycloak:keycloak-common:25.0.2'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
