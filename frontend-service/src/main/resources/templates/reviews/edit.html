@@ -8,7 +8,7 @@
 <div>
     <div th:insert="~{fragments/menu :: commonMenu}"></div>
     <h3>Review editing page</h3>
-    <div>
+    <div th:if="${currentUser != null && currentUser.equals(review.getUser())}">
         <form th:method="PATCH" th:action="@{/reviews/__${review.getId()}__}" th:object="${review}">
             <div>
                 <label for="product">Product</label>
@@ -16,7 +16,7 @@
             </div>
             <div>
                 <label for="user">User</label>
-                <input id="user" type="text" name="user" th:value="${review.getUserView()}"/>
+                <input id="user" type="text" name="user" disabled th:value="${review.getUserView()}"/>
             </div>
             <div>
                 <label for="rating">Rating</label>

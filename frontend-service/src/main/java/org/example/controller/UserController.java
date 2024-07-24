@@ -50,10 +50,17 @@ public class UserController {
 
     @GetMapping("/{id}/edit")
     public String updatePage(@PathVariable Long id, Model model) {
+
         var user = userService.getById(id);
         if (user == null) {
             throw new NotFoundException(String.format("User with id=%s not found", id));
         }
+
+        var currentUser = getCurrentUserFromModel(model);
+        if (!user.equals(currentUser)) {
+            throw new RuntimeException("You are not allowed to edit this user");
+        }
+
         model.addAttribute("user", user);
         return "users/edit";
     }
@@ -80,5 +87,16 @@ public class UserController {
         } catch (NumberFormatException ignored) {}
 
         return userService.getByUsername(param);
+    }
+
+    private User getCurrentUserFromModel(Model model) {
+        var currentUserAttribute = model.getAttribute("currentUser");
+        if (currentUserAttribute == null) {
+            return null;
+        }
+        if (currentUserAttribute instanceof User currentUser) {
+            return currentUser;
+        }
+        return null;
     }
 }

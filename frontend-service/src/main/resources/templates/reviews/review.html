@@ -14,7 +14,7 @@
         <p>Rating: <span th:text="${review.getRating()}">rating</span></p>
         <p>Created at: <span th:text="${review.getCreatedAt()}">createdAt</span></p>
     </div>
-    <div>
+    <div th:if="${currentUser != null && currentUser.equals(review.getUser())}">
         <hr/>
         <p><a th:href="@{/reviews/__${review.getId()}__/edit}">Edit review</a></p>
         <form th:method="DELETE" th:action="@{/reviews/__${review.getId()}__}">

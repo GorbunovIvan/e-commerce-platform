@@ -8,11 +8,11 @@
 <div>
     <div th:insert="~{fragments/menu :: commonMenu}"></div>
     <h3>User editing page</h3>
-    <div>
+    <div th:if="${currentUser != null && currentUser.equals(user)}">
         <form th:method="PATCH" th:action="@{/users/__${user.getId()}__}" th:object="${user}">
             <div>
                 <label for="username">Username</label>
-                <input id="username" type="text" th:field="*{username}"/>
+                <input id="username" type="text" disabled th:field="*{username}"/>
             </div>
             <div>
                 <input type="submit" value="Update"/>

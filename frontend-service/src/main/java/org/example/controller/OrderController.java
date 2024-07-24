@@ -5,6 +5,7 @@ import org.example.exception.NotFoundException;
 import org.example.model.orders.Order;
 import org.example.model.orders.Status;
 import org.example.model.products.Product;
+import org.example.model.users.User;
 import org.example.service.orders.OrderService;
 import org.example.service.orders.StatusTrackerRecordService;
 import org.springframework.stereotype.Controller;
@@ -42,16 +43,24 @@ public class OrderController {
 
     @GetMapping("/new")
     public String createPage(Model model, @RequestParam(required = false) Product product) {
+
         var order = new Order();
+
         if (product != null) {
             order.setProduct(product);
         }
+
+        var currentUser = getCurrentUserFromModel(model);
+        order.setUser(currentUser);
+
         model.addAttribute("order", order);
         return "orders/new";
     }
 
     @PostMapping
-    public String create(@ModelAttribute Order order) {
+    public String create(@ModelAttribute Order order, Model model) {
+        var currentUser = getCurrentUserFromModel(model);
+        order.setUser(currentUser);
         var orderCreated = orderService.create(order);
         if (orderCreated == null) { // In the case of asynchronous creation
             return "redirect:/orders";
@@ -61,10 +70,17 @@ public class OrderController {
 
     @GetMapping("/{id}/edit")
     public String updatePage(@PathVariable String id, Model model) {
+
         var order = orderService.getById(id);
         if (order == null) {
             throw new NotFoundException(String.format("Order with id=%s not found", id));
         }
+
+        var currentUser = getCurrentUserFromModel(model);
+        if (currentUser == null || !currentUser.equals(order.getUser())) {
+            throw new RuntimeException("You are not allowed to edit this order");
+        }
+
         model.addAttribute("order", order);
         return "orders/edit";
     }
@@ -77,10 +93,17 @@ public class OrderController {
 
     @GetMapping("/{id}/edit-status")
     public String changeOrderStatusPage(@PathVariable String id, Model model) {
+
         var order = orderService.getById(id);
         if (order == null) {
             throw new NotFoundException(String.format("Order with id=%s not found", id));
         }
+
+        var currentUser = getCurrentUserFromModel(model);
+        if (currentUser == null || !currentUser.equals(order.getUser())) {
+            throw new RuntimeException("You are not allowed to edit the status of this order");
+        }
+
         model.addAttribute("order", order);
         model.addAttribute("statusesAvailable", List.of(Status.values()));
         return "orders/edit-status";
@@ -96,5 +119,16 @@ public class OrderController {
     public String deleteById(@PathVariable String id) {
         orderService.deleteById(id);
         return "redirect:/orders";
+    }
+
+    private User getCurrentUserFromModel(Model model) {
+        var currentUserAttribute = model.getAttribute("currentUser");
+        if (currentUserAttribute == null) {
+            return null;
+        }
+        if (currentUserAttribute instanceof User currentUser) {
+            return currentUser;
+        }
+        return null;
     }
 }

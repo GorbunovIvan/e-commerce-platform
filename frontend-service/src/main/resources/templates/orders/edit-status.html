@@ -8,7 +8,7 @@
 <div>
     <div th:insert="~{fragments/menu :: commonMenu}"></div>
     <h3>Order status editing page</h3>
-    <div>
+    <div th:if="${currentUser != null && currentUser.equals(order.getUser())}">
         <form method="POST" th:action="@{/orders/__${order.getId()}__/edit-status}">
             <div>
                 <label for="status">New Status</label>

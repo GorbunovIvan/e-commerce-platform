@@ -3,6 +3,7 @@ package org.example.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.exception.NotFoundException;
 import org.example.model.products.Product;
+import org.example.model.users.User;
 import org.example.service.orders.OrderService;
 import org.example.service.products.ProductService;
 import org.example.service.reviews.ReviewService;
@@ -46,17 +47,26 @@ public class ProductController {
     }
 
     @PostMapping
-    public String create(@ModelAttribute Product product) {
+    public String create(@ModelAttribute Product product, Model model) {
+        var currentUser = getCurrentUserFromModel(model);
+        product.setUser(currentUser);
         var productCreated = productService.create(product);
         return "redirect:/products/" + productCreated.getId();
     }
 
     @GetMapping("/{id}/edit")
     public String updatePage(@PathVariable Long id, Model model) {
+
         var product = productService.getById(id);
         if (product == null) {
             throw new NotFoundException(String.format("Product with id=%s not found", id));
         }
+
+        var currentUser = getCurrentUserFromModel(model);
+        if (currentUser == null || !currentUser.equals(product.getUser())) {
+            throw new RuntimeException("You are not allowed to edit this product");
+        }
+
         model.addAttribute("product", product);
         return "products/edit";
     }
@@ -71,5 +81,16 @@ public class ProductController {
     public String deleteById(@PathVariable Long id) {
         productService.deleteById(id);
         return "redirect:/products";
+    }
+
+    private User getCurrentUserFromModel(Model model) {
+        var currentUserAttribute = model.getAttribute("currentUser");
+        if (currentUserAttribute == null) {
+            return null;
+        }
+        if (currentUserAttribute instanceof User currentUser) {
+            return currentUser;
+        }
+        return null;
     }
 }

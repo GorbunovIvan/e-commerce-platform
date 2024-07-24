@@ -8,7 +8,7 @@
 <div>
     <div th:insert="~{fragments/menu :: commonMenu}"></div>
     <h3>Product editing page</h3>
-    <div>
+    <div th:if="${currentUser != null && currentUser.equals(product.getUser())}">
         <form th:method="PATCH" th:action="@{/products/__${product.getId()}__}" th:object="${product}">
             <div>
                 <label for="name">Name</label>

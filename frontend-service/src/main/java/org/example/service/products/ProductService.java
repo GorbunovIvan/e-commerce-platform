@@ -41,8 +41,7 @@ public class ProductService {
     public Product create(Product product) {
         log.info("Creating product '{}'", product);
         if (product.getUser() == null) {
-            //TODO - must be filled with current user
-            product.setUser(new User(999L, null));
+            log.warn("User of product is empty!");
         }
         var result = productRepository.create(product);
         return modelBinder.bindFields(result);

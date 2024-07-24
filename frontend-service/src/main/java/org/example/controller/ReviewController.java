@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.exception.NotFoundException;
 import org.example.model.products.Product;
 import org.example.model.reviews.Review;
+import org.example.model.users.User;
 import org.example.service.reviews.ReviewService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,26 +36,41 @@ public class ReviewController {
 
     @GetMapping("/new")
     public String createPage(Model model, @RequestParam(required = false) Product product) {
+
         var review = new Review();
+
         if (product != null) {
             review.setProduct(product);
         }
+
+        var currentUser = getCurrentUserFromModel(model);
+        review.setUser(currentUser);
+
         model.addAttribute("review", review);
         return "reviews/new";
     }
 
     @PostMapping
-    public String create(@ModelAttribute Review review) {
+    public String create(@ModelAttribute Review review, Model model) {
+        var currentUser = getCurrentUserFromModel(model);
+        review.setUser(currentUser);
         var reviewCreated = reviewService.create(review);
         return "redirect:/reviews/" + reviewCreated.getId();
     }
 
     @GetMapping("/{id}/edit")
     public String updatePage(@PathVariable String id, Model model) {
+
         var review = reviewService.getById(id);
         if (review == null) {
             throw new NotFoundException(String.format("Review with id=%s not found", id));
         }
+
+        var currentUser = getCurrentUserFromModel(model);
+        if (currentUser == null || !currentUser.equals(review.getUser())) {
+            throw new RuntimeException("You are not allowed to edit this review");
+        }
+
         model.addAttribute("review", review);
         return "reviews/edit";
     }
@@ -69,5 +85,16 @@ public class ReviewController {
     public String deleteById(@PathVariable String id) {
         reviewService.deleteById(id);
         return "redirect:/reviews";
+    }
+
+    private User getCurrentUserFromModel(Model model) {
+        var currentUserAttribute = model.getAttribute("currentUser");
+        if (currentUserAttribute == null) {
+            return null;
+        }
+        if (currentUserAttribute instanceof User currentUser) {
+            return currentUser;
+        }
+        return null;
     }
 }
