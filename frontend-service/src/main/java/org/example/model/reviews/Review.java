@@ -13,7 +13,7 @@ import java.time.temporal.ChronoUnit;
 @Getter @Setter
 @EqualsAndHashCode(of = { "product", "user", "createdAt" })
 @ToString
-public class Review implements PersistedModel<String> {
+public class Review implements PersistedModel<String>, Comparable<Review> {
 
     private String id;
     private Product product;
@@ -82,5 +82,16 @@ public class Review implements PersistedModel<String> {
     @Override
     public String getUniqueIdentifierForBindingWithOtherServices() {
         return getId();
+    }
+
+    @Override
+    public int compareTo(Review o) {
+        if (o.getCreatedAt() == null) {
+            return 1;
+        }
+        if (getCreatedAt() == null) {
+            return -1;
+        }
+        return getCreatedAt().compareTo(o.getCreatedAt());
     }
 }

@@ -32,7 +32,9 @@ public class ProductRepositoryDummy implements ProductRepository {
             productsStream = productsStream.filter(product -> Objects.equals(product.getUser(), user));
         }
 
-        return productsStream.toList();
+        return productsStream
+                .sorted(Comparator.reverseOrder())
+                .toList();
     }
 
     @Override

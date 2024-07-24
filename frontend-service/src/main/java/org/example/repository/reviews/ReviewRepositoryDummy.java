@@ -36,7 +36,9 @@ public class ReviewRepositoryDummy implements ReviewRepository {
     @Override
     public List<Review> getAll() {
         log.info("Searching for all reviews");
-        return new ArrayList<>(reviews);
+        var reviewsResult = new ArrayList<>(reviews);
+        Collections.sort(reviewsResult);
+        return reviewsResult;
     }
 
     @Override

@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 @Getter @Setter
 @EqualsAndHashCode(of = { "name", "category", "user", "createdAt" })
 @ToString
-public class Product implements PersistedModel<Long> {
+public class Product implements PersistedModel<Long>, Comparable<Product> {
 
     private Long id;
     private String name;
@@ -60,5 +60,16 @@ public class Product implements PersistedModel<Long> {
     @Override
     public Long getUniqueIdentifierForBindingWithOtherServices() {
         return getId();
+    }
+
+    @Override
+    public int compareTo(Product o) {
+        if (o.getCreatedAt() == null) {
+            return 1;
+        }
+        if (getCreatedAt() == null) {
+            return -1;
+        }
+        return getCreatedAt().compareTo(o.getCreatedAt());
     }
 }
