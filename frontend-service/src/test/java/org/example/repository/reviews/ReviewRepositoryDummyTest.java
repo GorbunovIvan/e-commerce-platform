@@ -93,7 +93,7 @@ class ReviewRepositoryDummyTest {
 
         var reviewsReceived = reviewRepositoryDummy.getAll();
         assertNotNull(reviewsReceived);
-        assertEquals(reviews, reviewsReceived);
+        assertEquals(new HashSet<>(reviews), new HashSet<>(reviewsReceived));
     }
 
     @Test

@@ -168,10 +168,27 @@ class OrderControllerTest {
 
         when(orderService.getById(id)).thenReturn(orderExisting);
 
-        mockMvc.perform(get("/orders/{id}/edit", id))
+        mockMvc.perform(get("/orders/{id}/edit", id)
+                        .flashAttr("currentUser", orderExisting.getUser()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("orders/edit"))
                 .andExpect(model().attribute("order", orderExisting));
+
+        verify(orderService, times(1)).getById(id);
+    }
+
+    @Test
+    void shouldReturnErrorPageForUnauthorizedWhenUpdatePage() throws Exception {
+
+        var id = "734";
+
+        var orderExisting = easyRandom.nextObject(Order.class);
+        orderExisting.setId(id);
+
+        when(orderService.getById(id)).thenReturn(orderExisting);
+
+        mockMvc.perform(get("/orders/{id}/edit", id))
+                .andExpect(view().name("error"));
 
         verify(orderService, times(1)).getById(id);
     }
@@ -230,11 +247,28 @@ class OrderControllerTest {
 
         when(orderService.getById(id)).thenReturn(orderExisting);
 
-        mockMvc.perform(get("/orders/{id}/edit-status", id))
+        mockMvc.perform(get("/orders/{id}/edit-status", id)
+                        .flashAttr("currentUser", orderExisting.getUser()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("orders/edit-status"))
                 .andExpect(model().attribute("order", orderExisting))
                 .andExpect(model().attribute("statusesAvailable", List.of(Status.values())));
+
+        verify(orderService, times(1)).getById(id);
+    }
+
+    @Test
+    void shouldReturnErrorPageForUnauthorizedWhenChangeOrderStatusPage() throws Exception {
+
+        var id = "734";
+
+        var orderExisting = easyRandom.nextObject(Order.class);
+        orderExisting.setId(id);
+
+        when(orderService.getById(id)).thenReturn(orderExisting);
+
+        mockMvc.perform(get("/orders/{id}/edit-status", id))
+                .andExpect(view().name("error"));
 
         verify(orderService, times(1)).getById(id);
     }

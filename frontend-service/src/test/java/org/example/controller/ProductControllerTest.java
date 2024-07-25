@@ -145,10 +145,27 @@ class ProductControllerTest {
 
         when(productService.getById(id)).thenReturn(productExisting);
 
-        mockMvc.perform(get("/products/{id}/edit", id))
+        mockMvc.perform(get("/products/{id}/edit", id)
+                        .flashAttr("currentUser", productExisting.getUser()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("products/edit"))
                 .andExpect(model().attribute("product", productExisting));
+
+        verify(productService, times(1)).getById(id);
+    }
+
+    @Test
+    void shouldReturnErrorPageForUnauthorizedWhenUpdatePage() throws Exception {
+
+        var id = 345L;
+
+        var productExisting = easyRandom.nextObject(Product.class);
+        productExisting.setId(id);
+
+        when(productService.getById(id)).thenReturn(productExisting);
+
+        mockMvc.perform(get("/products/{id}/edit", id))
+                .andExpect(view().name("error"));
 
         verify(productService, times(1)).getById(id);
     }

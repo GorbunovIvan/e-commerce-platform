@@ -139,10 +139,27 @@ class ReviewControllerTest {
 
         when(reviewService.getById(id)).thenReturn(reviewExisting);
 
-        mockMvc.perform(get("/reviews/{id}/edit", id))
+        mockMvc.perform(get("/reviews/{id}/edit", id)
+                        .flashAttr("currentUser", reviewExisting.getUser()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("reviews/edit"))
                 .andExpect(model().attribute("review", reviewExisting));
+
+        verify(reviewService, times(1)).getById(id);
+    }
+
+    @Test
+    void shouldReturnErrorPageForUnauthorizedWhenUpdatePage() throws Exception {
+
+        var id = "734";
+
+        var reviewExisting = easyRandom.nextObject(Review.class);
+        reviewExisting.setId(id);
+
+        when(reviewService.getById(id)).thenReturn(reviewExisting);
+
+        mockMvc.perform(get("/reviews/{id}/edit", id))
+                .andExpect(view().name("error"));
 
         verify(reviewService, times(1)).getById(id);
     }

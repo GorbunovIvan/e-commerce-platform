@@ -185,10 +185,27 @@ class UserControllerTest {
 
         when(userService.getById(id)).thenReturn(userExisting);
 
-        mockMvc.perform(get("/users/{id}/edit", id))
+        mockMvc.perform(get("/users/{id}/edit", id)
+                        .flashAttr("currentUser", userExisting))
                 .andExpect(status().isOk())
                 .andExpect(view().name("users/edit"))
                 .andExpect(model().attribute("user", userExisting));
+
+        verify(userService, times(1)).getById(id);
+    }
+
+    @Test
+    void shouldReturnErrorPageForUnauthorizedUserWhenUpdatePage() throws Exception {
+
+        var id = 345L;
+
+        var userExisting = easyRandom.nextObject(User.class);
+        userExisting.setId(id);
+
+        when(userService.getById(id)).thenReturn(userExisting);
+
+        mockMvc.perform(get("/users/{id}/edit", id))
+                .andExpect(view().name("error"));
 
         verify(userService, times(1)).getById(id);
     }
@@ -242,7 +259,7 @@ class UserControllerTest {
 
         mockMvc.perform(delete("/users/{id}", id))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/users"));
+                .andExpect(view().name("redirect:/auth/logout"));
 
         verify(userService, times(1)).deleteById(id);
     }

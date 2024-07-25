@@ -4,6 +4,12 @@ spring:
       filter:
         enabled: true
 
+  security:
+    oauth2:
+      client:
+        registration: {}
+        provider: {}
+
   rabbitmq:
     host: localhost
     topicExchange: test-topic

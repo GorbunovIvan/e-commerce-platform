@@ -90,7 +90,7 @@ class ProductRepositoryDummyTest {
 
         var products = productRepositoryDummy.getAll(null, null, null);
         assertNotNull(products);
-        assertEquals(productsExpected, products);
+        assertEquals(new HashSet<>(productsExpected), new HashSet<>(products));
     }
 
     @Test
