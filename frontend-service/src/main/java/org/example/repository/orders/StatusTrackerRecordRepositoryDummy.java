@@ -93,7 +93,7 @@ public class StatusTrackerRecordRepositoryDummy implements StatusTrackerRecordRe
                         ));
     }
 
-    protected StatusTrackerRecord create(StatusTrackerRecord statusTrackerRecord) {
+    protected synchronized StatusTrackerRecord create(StatusTrackerRecord statusTrackerRecord) {
         log.info("Creating new status tracker record '{}'", statusTrackerRecord);
         var nextId = nextId();
         statusTrackerRecord.setId(nextId);

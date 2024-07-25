@@ -31,10 +31,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/notification-service" />
-            <option value="$PROJECT_DIR$/order-service" />
-            <option value="$PROJECT_DIR$/product-service" />
-            <option value="$PROJECT_DIR$/review-service" />
-            <option value="$PROJECT_DIR$/user-service" />
           </set>
         </option>
       </GradleProjectSettings>

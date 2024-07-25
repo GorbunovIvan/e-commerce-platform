@@ -55,7 +55,7 @@ public class ProductRepositoryDummy implements ProductRepository {
     }
 
     @Override
-    public Product create(Product product) {
+    public synchronized Product create(Product product) {
 
         log.info("Creating product '{}'", product);
 

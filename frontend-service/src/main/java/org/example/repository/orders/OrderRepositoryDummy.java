@@ -73,7 +73,7 @@ public class OrderRepositoryDummy implements OrderRepository {
     }
 
     @Override
-    public Order create(Order order) {
+    public synchronized Order create(Order order) {
         log.info("Creating order '{}'", order);
         var nextId = nextId();
         order.setId(nextId);

@@ -48,7 +48,7 @@ public class UserRepositoryDummy implements UserRepository {
     }
 
     @Override
-    public User create(User user) {
+    public synchronized User create(User user) {
         log.info("Creating user '{}'", user);
         var nextId = nextId();
         user.setId(nextId);

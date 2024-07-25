@@ -56,27 +56,27 @@ keycloak:
   web-registration-name: "keycloak-web" # taken from "security.oauth2.client.registration.<>"
 
 dummy-repositories:
-  enabled: true
+  pre-fill-with-dummy-data: false
 
 user-service:
-  enabled: false
+  enabled: true
   name: user-service
   url: http://localhost:8081/api/v1/users
 
 product-service:
-  enabled: false
+  enabled: true
   name: product-service
   url: http://localhost:8082/api/v1/products
 
 order-service:
-  enabled: false
+  enabled: true
   graphql-url: http://localhost:8083/graphql
 
 review-service:
-  enabled: false
+  enabled: true
   grpc:
     host: localhost
     port: 9090
 
 notification-service:
-  enabled: false
+  enabled: true

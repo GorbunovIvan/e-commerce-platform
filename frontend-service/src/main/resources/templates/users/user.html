@@ -14,9 +14,11 @@
     <div th:if="${currentUser != null && currentUser.equals(user)}">
         <hr/>
         <p><a th:href="@{/users/__${user.getId()}__/edit}">Edit user</a></p>
-        <form th:method="DELETE" th:action="@{/users/__${user.getId()}__}">
-            <input type="submit" value="Delete user"/>
-        </form>
+<!--        Deleting user is disabled, because since in Keycloak user will be remained (don't know how to delete user from there),-->
+<!--        the user with the same username will be immediately recreated from current Principal (look AuthenticationControllerAdvice.class)-->
+<!--        <form th:method="DELETE" th:action="@{/users/__${user.getId()}__}">-->
+<!--            <input type="submit" value="Delete user"/>-->
+<!--        </form>-->
     </div>
     <div>
         <hr/>

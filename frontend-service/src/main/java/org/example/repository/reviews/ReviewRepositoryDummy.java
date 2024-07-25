@@ -124,7 +124,7 @@ public class ReviewRepositoryDummy implements ReviewRepository {
     }
 
     @Override
-    public Review create(Review review) {
+    public synchronized Review create(Review review) {
         log.info("Creating review '{}'", review);
         var nextId = nextId();
         review.setId(nextId);
