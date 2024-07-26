@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -32,6 +33,12 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/ids/{ids}")
+    public ResponseEntity<List<User>> getByIds(@PathVariable Collection<Long> ids) {
+        var users = userService.getByIds(ids);
+        return ResponseEntity.ok(users);
+    }
+
     @GetMapping("/username/{username}")
     public ResponseEntity<User> getByUsername(@PathVariable String username) {
         var user = userService.getByUsername(username);
@@ -47,7 +54,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<User> update(@PathVariable Long id, @RequestBody UserDTO userDTO) {
         var user = userService.update(id, userDTO);
         if (user == null) {

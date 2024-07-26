@@ -20,7 +20,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -82,7 +84,7 @@ class UserControllerTest {
 
         var usersExpected = List.of(
                 new User(1L, "user-1", LocalDate.now().minusDays(3)),
-                new User(3L, "user-2", LocalDate.now().minusDays(2)),
+                new User(2L, "user-2", LocalDate.now().minusDays(2)),
                 new User(3L, "user-3", LocalDate.now().minusDays(1))
         );
 
@@ -160,6 +162,61 @@ class UserControllerTest {
 
         verify(userService, times(1)).getById(id);
         verify(userService, only()).getById(id);
+    }
+
+    @Test
+    void shouldReturnListOfUsersWhenGetByIds() throws Exception {
+
+        var usersExpected = List.of(
+                new User(1L, "user-1", LocalDate.now().minusDays(3)),
+                new User(2L, "user-2", LocalDate.now().minusDays(2)),
+                new User(3L, "user-3", LocalDate.now().minusDays(1))
+        );
+
+        var ids = usersExpected.stream().map(User::getId).collect(Collectors.toCollection(LinkedHashSet::new));
+        var idsParam = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+
+        when(userService.getByIds(ids)).thenReturn(usersExpected);
+
+        var jsonResponse = mockMvc.perform(get(baseURI + "/ids/{id}", idsParam)
+                        .with(jwt().jwt(jwt)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<User> users = objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+
+        assertNotNull(users);
+        assertFalse(users.isEmpty());
+        assertEquals(usersExpected, users);
+
+        verify(userService, times(1)).getByIds(ids);
+        verify(userService, only()).getByIds(ids);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenGetByIds() throws Exception {
+
+        var ids = new LinkedHashSet<>(List.of(1L, 2L, 3L));
+        var idsParam = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+
+        when(userService.getByIds(ids)).thenReturn(Collections.emptyList());
+
+        var jsonResponse = mockMvc.perform(get(baseURI + "/ids/{id}", idsParam)
+                        .with(jwt().jwt(jwt)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<User> users = objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+
+        assertNotNull(users);
+        assertTrue(users.isEmpty());
+
+        verify(userService, times(1)).getByIds(ids);
+        verify(userService, only()).getByIds(ids);
     }
 
     @Test
@@ -253,7 +310,7 @@ class UserControllerTest {
         var userDTO = new UserDTO("new-username", LocalDate.now().minusDays(10));
         var jsonUserDTO = objectMapper.writeValueAsString(userDTO);
 
-        var jsonResponse = mockMvc.perform(patch(baseURI + "/{id}", id)
+        var jsonResponse = mockMvc.perform(put(baseURI + "/{id}", id)
                         .with(jwt().jwt(jwt))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUserDTO))
@@ -281,7 +338,7 @@ class UserControllerTest {
         var userDTO = new UserDTO("new-username", LocalDate.now().minusDays(10));
         var jsonUserDTO = objectMapper.writeValueAsString(userDTO);
 
-        mockMvc.perform(patch(baseURI + "/{id}", id)
+        mockMvc.perform(put(baseURI + "/{id}", id)
                         .with(jwt().jwt(jwt))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonUserDTO))
