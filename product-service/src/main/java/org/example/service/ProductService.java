@@ -3,14 +3,17 @@ package org.example.service;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.model.Category;
 import org.example.model.DTO.ProductDTO;
 import org.example.model.Product;
+import org.example.repository.CategoryRepository;
 import org.example.repository.ProductRepository;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -19,11 +22,17 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     public Product getById(@NotNull Long id) {
         log.info("Searching for product with id={}", id);
         return productRepository.findById(id)
                 .orElse(null);
+    }
+
+    public List<Product> getByIds(Collection<Long> ids) {
+        log.info("Searching for products with ids={}", ids);
+        return productRepository.findAllByIdIn(ids);
     }
 
     public List<Product> getAll() {
@@ -81,5 +90,16 @@ public class ProductService {
     public void deleteById(@NotNull Long id) {
         log.warn("Deleting product with id={}", id);
         productRepository.deleteById(id);
+    }
+
+    public Category getCategoryByName(@NotNull String categoryName) {
+        log.info("Searching for category with name={}", categoryName);
+        return categoryRepository.findByName(categoryName)
+                .orElse(null);
+    }
+
+    public List<Category> getCategoriesByNames(Collection<String> categoryNames) {
+        log.info("Searching for categories with names={}", categoryNames);
+        return categoryRepository.findAllByNameIn(categoryNames);
     }
 }

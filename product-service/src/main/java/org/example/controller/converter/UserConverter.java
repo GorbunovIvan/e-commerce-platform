@@ -8,6 +8,8 @@ import org.example.model.User;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.regex.Pattern;
+
 @Component
 @Slf4j
 public class UserConverter implements Converter<String, User> {
@@ -22,7 +24,11 @@ public class UserConverter implements Converter<String, User> {
             return null;
         }
 
-        var id = Long.parseLong(source);
+        var id = stringToLong(source);
+        if (id == null) {
+            var pattern = Pattern.compile(".*id=(\\d+)");
+            id = readIdFromStringByPattern(pattern, source);
+        }
 
         log.info("Converting user by id '{}' to object", id);
 
@@ -36,5 +42,28 @@ public class UserConverter implements Converter<String, User> {
         user = new User(id);
 //        entityManager.persist(user);
         return user;
+    }
+
+    protected Long readIdFromStringByPattern(Pattern pattern, String str) {
+        log.info("Parsing id from string '{}' by pattern: {}", str, pattern);
+        try {
+            var matcher = pattern.matcher(str);
+            if (matcher.find()
+                    && matcher.groupCount() == 1) {
+                String id = matcher.group(1);
+                log.info("Parsed '{}' from string '{}' by pattern: {}", id, str, pattern);
+                return stringToLong(id);
+            }
+        } catch (Exception ignored) {}
+
+        return null;
+    }
+
+    protected Long stringToLong(String str) {
+        try {
+            return Long.parseLong(str);
+        } catch (Exception ignored) {}
+
+        return null;
     }
 }
