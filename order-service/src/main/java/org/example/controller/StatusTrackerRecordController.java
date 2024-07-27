@@ -9,6 +9,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,6 +23,11 @@ public class StatusTrackerRecordController {
     @QueryMapping
     public StatusTrackerRecord getStatusRecordById(@Argument String id) {
         return statusTrackerRecordService.getById(id);
+    }
+
+    @QueryMapping
+    public List<StatusTrackerRecord> getStatusRecordsByIds(@Argument Collection<String> ids) {
+        return statusTrackerRecordService.getByIds(ids);
     }
 
     @QueryMapping

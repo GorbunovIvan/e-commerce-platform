@@ -5,11 +5,13 @@ import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public interface StatusTrackerRecordRepository extends MongoRepository<StatusTrackerRecord, String> {
 
+    List<StatusTrackerRecord> findAllByIdIn(@Param("ids") Collection<String> ids);
     List<StatusTrackerRecord> findAllByOrderId(@Param("orderId") String orderId);
     List<StatusTrackerRecord> findAllByOrderIdIn(@Param("orderIds") List<String> orderIds);
     Optional<StatusTrackerRecord> findFirstByOrderIdOrderByTimeDesc(@Param("orderId") String orderId);

@@ -62,6 +62,38 @@ class OrderServiceTest {
     }
 
     @Test
+    void shouldReturnListOfOrdersWhenGetByIds() {
+
+        var orders = easyRandom.objects(Order.class, 5).toList();
+        var ordersIds = orders.stream().map(Order::getId).toList();
+
+        when(orderRepository.findAllByIdIn(ordersIds)).thenReturn(orders);
+
+        var ordersReceived = orderService.getByIds(ordersIds);
+        assertNotNull(ordersReceived);
+        assertFalse(ordersReceived.isEmpty());
+        assertEquals(orders, ordersReceived);
+
+        verify(orderRepository, times(1)).findAllByIdIn(ordersIds);
+        verify(statusTrackerRecordService, times(1)).getCurrentStatusesOfOrders(ordersIds);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenGetByIds() {
+
+        var ordersIds = easyRandom.objects(String.class, 4).toList();
+
+        when(orderRepository.findAllByIdIn(any())).thenReturn(Collections.emptyList());
+
+        var ordersReceived = orderService.getByIds(ordersIds);
+        assertNotNull(ordersReceived);
+        assertTrue(ordersReceived.isEmpty());
+
+        verify(orderRepository, times(1)).findAllByIdIn(ordersIds);
+        verify(statusTrackerRecordService, never()).getCurrentStatusesOfOrders(any());
+    }
+
+    @Test
     void shouldReturnListOfOrdersWhenGetAll() {
 
         var orders = easyRandom.objects(Order.class, 5).toList();

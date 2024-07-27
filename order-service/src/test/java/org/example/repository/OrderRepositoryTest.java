@@ -14,8 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataMongoTest
 class OrderRepositoryTest {
@@ -57,6 +56,31 @@ class OrderRepositoryTest {
         for (String collectionName : mongoTemplate.getCollectionNames()) {
             mongoTemplate.dropCollection(collectionName);
         }
+    }
+
+    @Test
+    void shouldReturnListOfOrdersWhenFindAllByIdIn() {
+        var ids = orders.stream().map(Order::getId).toList();
+        var ordersReceived = repository.findAllByIdIn(ids);
+        assertFalse(ordersReceived.isEmpty());
+        assertEquals(new HashSet<>(orders), new HashSet<>(ordersReceived));
+    }
+
+    @Test
+    void shouldReturnListWithOneOrderWhenFindAllByIdIn() {
+        for (var order : orders) {
+            var ids = List.of(order.getId());
+            var ordersReceived = repository.findAllByIdIn(ids);
+            assertEquals(1, ordersReceived.size());
+            assertEquals(List.of(order), ordersReceived);
+        }
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenFindAllByIdIn() {
+        var ids = new ArrayList<String>();
+        var ordersReceived = repository.findAllByIdIn(ids);
+        assertTrue(ordersReceived.isEmpty());
     }
 
     @Test

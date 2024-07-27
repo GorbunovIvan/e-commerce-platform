@@ -4,12 +4,14 @@ type Query {
 
     # orders
     getOrderById(id: String): Order
+    getOrdersByIds(ids: [String]): [Order]
     getAllOrders: [Order]
     getAllOrdersByUser(userId: Long): [Order]
     getAllOrdersByProduct(productId: Long): [Order]
 
     # statuses
     getStatusRecordById(id: String): StatusRecord
+    getStatusRecordsByIds(ids: [String]): [StatusRecord]
     getAllStatusRecordsByOrder(orderId: String): [StatusRecord]
     getAllCurrentStatusRecords: [StatusRecord]
     getAllStatusRecordsByCurrentStatus(status: String): [StatusRecord]

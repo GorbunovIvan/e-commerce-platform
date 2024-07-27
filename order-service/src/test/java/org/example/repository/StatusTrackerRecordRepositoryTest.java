@@ -14,8 +14,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataMongoTest
 class StatusTrackerRecordRepositoryTest {
@@ -72,6 +71,31 @@ class StatusTrackerRecordRepositoryTest {
         for (String collectionName : mongoTemplate.getCollectionNames()) {
             mongoTemplate.dropCollection(collectionName);
         }
+    }
+
+    @Test
+    void shouldReturnListOfOrdersWhenFindAllByIdIn() {
+        var ids = statusRecords.stream().map(StatusTrackerRecord::getId).toList();
+        var statusRecordsReceived = repository.findAllByIdIn(ids);
+        assertFalse(statusRecordsReceived.isEmpty());
+        assertEquals(new HashSet<>(statusRecords), new HashSet<>(statusRecordsReceived));
+    }
+
+    @Test
+    void shouldReturnListWithOneOrderWhenFindAllByIdIn() {
+        for (var statusRecord : statusRecords) {
+            var ids = List.of(statusRecord.getId());
+            var statusRecordsReceived = repository.findAllByIdIn(ids);
+            assertEquals(1, statusRecordsReceived.size());
+            assertEquals(List.of(statusRecord), statusRecordsReceived);
+        }
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenFindAllByIdIn() {
+        var ids = new ArrayList<String>();
+        var statusRecordsReceived = repository.findAllByIdIn(ids);
+        assertTrue(statusRecordsReceived.isEmpty());
     }
 
     @Test
