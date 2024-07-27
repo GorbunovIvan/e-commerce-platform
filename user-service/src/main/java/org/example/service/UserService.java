@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -29,6 +30,11 @@ public class UserService {
         log.info("Searching for user with id={}", id);
         return userRepository.findById(id)
                 .orElse(null);
+    }
+
+    public List<User> getByIds(Collection<Long> ids) {
+        log.info("Searching for users with ids={}", ids);
+        return userRepository.findAllByIdIn(ids);
     }
 
     public User getByUsername(@NotNull String username) {

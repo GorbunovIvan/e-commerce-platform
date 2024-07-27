@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -85,6 +86,43 @@ class UserServiceTest {
 
         verify(userRepository, times(1)).findById(id);
         verify(userRepository, only()).findById(id);
+    }
+
+    @Test
+    void shouldReturnListOfUsersWhenGetByIds() {
+
+        var usersExpected = List.of(
+                new User(1L, "user-1", LocalDate.now().minusDays(3)),
+                new User(2L, "user-2", LocalDate.now().minusDays(2)),
+                new User(3L, "user-3", LocalDate.now().minusDays(1))
+        );
+
+        var ids = usersExpected.stream().map(User::getId).collect(Collectors.toList());
+
+        when(userRepository.findAllByIdIn(ids)).thenReturn(usersExpected);
+
+        var users = userService.getByIds(ids);
+        assertNotNull(users);
+        assertFalse(users.isEmpty());
+        assertEquals(usersExpected, users);
+
+        verify(userRepository, times(1)).findAllByIdIn(ids);
+        verify(userRepository, only()).findAllByIdIn(ids);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenGetByIds() {
+
+        var ids = List.of(1L, 2L, 3L);
+
+        when(userRepository.findAllByIdIn(ids)).thenReturn(Collections.emptyList());
+
+        var users = userService.getByIds(ids);
+        assertNotNull(users);
+        assertTrue(users.isEmpty());
+
+        verify(userRepository, times(1)).findAllByIdIn(ids);
+        verify(userRepository, only()).findAllByIdIn(ids);
     }
 
     @Test

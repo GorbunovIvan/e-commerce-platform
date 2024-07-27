@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter
+@EqualsAndHashCode(of = { "username" })
 @ToString
 public class UserDTO {
 
