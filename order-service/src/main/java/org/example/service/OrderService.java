@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -26,6 +27,13 @@ public class OrderService {
         var orderOptional = orderRepository.findById(id);
         orderOptional.ifPresent(this::fillCurrentStatusToOrder);
         return orderOptional.orElse(null);
+    }
+
+    public List<Order> getByIds(Collection<String> ids) {
+        log.info("Searching for orders with ids={}", ids);
+        var orders = orderRepository.findAllByIdIn(ids);
+        fillCurrentStatusesToOrders(orders);
+        return orders;
     }
 
     public List<Order> getAll() {

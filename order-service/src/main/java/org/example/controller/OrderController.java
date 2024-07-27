@@ -7,6 +7,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
+import java.util.Collection;
 import java.util.List;
 
 @Controller
@@ -18,6 +19,11 @@ public class OrderController {
     @QueryMapping
     public Order getOrderById(@Argument String id) {
         return orderService.getById(id);
+    }
+
+    @QueryMapping
+    public List<Order> getOrdersByIds(@Argument Collection<String> ids) {
+        return orderService.getByIds(ids);
     }
 
     @QueryMapping

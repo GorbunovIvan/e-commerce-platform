@@ -14,6 +14,8 @@ import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -93,6 +95,70 @@ class StatusTrackerRecordControllerTest {
                 .valueIsNull();
 
         verify(statusTrackerRecordService, times(1)).getById(id);
+    }
+
+    @Test
+    void shouldReturnListOfStatusRecordsWhenGetStatusRecordsByIds() {
+
+        var statusRecords = easyRandom.objects(StatusTrackerRecord.class, 5).toList();
+        var ids = statusRecords.stream().map(StatusTrackerRecord::getId).collect(Collectors.toCollection(LinkedHashSet::new));
+
+        when(statusTrackerRecordService.getByIds(ids)).thenReturn(statusRecords);
+
+        String query = """
+                {
+                  getStatusRecordsByIds(ids: ["%s"]) {
+                     id
+                     orderId
+                     status
+                     time
+                  }
+                }
+                """;
+
+        var idsAsParam = String.join("\", \"", ids);
+        query = String.format(query, idsAsParam);
+
+        var statusRecordsReceived = graphQlTester.document(query)
+                .execute()
+                .path("data.getStatusRecordsByIds")
+                .hasValue()
+                .entityList(StatusTrackerRecord.class)
+                .hasSizeGreaterThan(0)
+                .get();
+
+        assertNotNull(statusRecordsReceived);
+        assertEquals(statusRecords, statusRecordsReceived);
+
+        verify(statusTrackerRecordService, times(1)).getByIds(ids);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenGetStatusRecordsByIds() {
+
+        var ids = easyRandom.objects(String.class, 3).collect(Collectors.toCollection(LinkedHashSet::new));
+
+        when(statusTrackerRecordService.getByIds(ids)).thenReturn(Collections.emptyList());
+
+        String query = """
+                {
+                  getStatusRecordsByIds(ids: ["%s"]) {
+                     id
+                  }
+                }
+                """;
+
+        var idsAsParam = String.join("\", \"", ids);
+        query = String.format(query, idsAsParam);
+
+        graphQlTester.document(query)
+                .execute()
+                .path("data.getStatusRecordsByIds")
+                .hasValue()
+                .entityList(StatusTrackerRecord.class)
+                .hasSize(0);
+
+        verify(statusTrackerRecordService, times(1)).getByIds(ids);
     }
 
     @Test

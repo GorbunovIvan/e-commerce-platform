@@ -60,6 +60,35 @@ class StatusTrackerRecordServiceTest {
     }
 
     @Test
+    void shouldReturnListOfStatusRecordsWhenGetByIds() {
+
+        var statusRecords = easyRandom.objects(StatusTrackerRecord.class, 5).toList();
+        var ids = statusRecords.stream().map(StatusTrackerRecord::getId).toList();
+
+        when(repository.findAllByIdIn(ids)).thenReturn(statusRecords);
+
+        var statusRecordReceived = statusTrackerRecordService.getByIds(ids);
+        assertNotNull(statusRecordReceived);
+        assertEquals(statusRecords, statusRecordReceived);
+
+        verify(repository, times(1)).findAllByIdIn(ids);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenGetByIds() {
+
+        var ids = easyRandom.objects(String.class, 4).toList();
+
+        when(repository.findAllByIdIn(any())).thenReturn(Collections.emptyList());
+
+        var statusRecordReceived = statusTrackerRecordService.getByIds(ids);
+        assertNotNull(statusRecordReceived);
+        assertTrue(statusRecordReceived.isEmpty());
+
+        verify(repository, times(1)).findAllByIdIn(ids);
+    }
+
+    @Test
     void shouldReturnListOfStatusRecordsWhenGetAllByOrder() {
 
         var orderId = "99";

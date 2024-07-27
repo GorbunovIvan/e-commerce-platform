@@ -11,10 +11,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +25,11 @@ public class StatusTrackerRecordService {
         log.info("Searching for status-record by id={}", id);
         return statusTrackerRecordRepository.findById(id)
                 .orElse(null);
+    }
+
+    public List<StatusTrackerRecord> getByIds(Collection<String> ids) {
+        log.info("Searching for status-records by ids={}", ids);
+        return statusTrackerRecordRepository.findAllByIdIn(ids);
     }
 
     public List<StatusTrackerRecord> getAllByOrder(String orderId) {

@@ -13,6 +13,8 @@ import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -94,6 +96,70 @@ class OrderControllerTest {
                 .valueIsNull();
 
         verify(orderService, times(1)).getById(id);
+    }
+
+    @Test
+    void shouldReturnListOfOrdersWhenGetByIds() {
+
+        var orders = easyRandom.objects(Order.class, 5).toList();
+        var ids = orders.stream().map(Order::getId).collect(Collectors.toCollection(LinkedHashSet::new));
+
+        when(orderService.getByIds(ids)).thenReturn(orders);
+
+        String query = """
+                {
+                  getOrdersByIds(ids: ["%s"]) {
+                      id
+                      userId
+                      productId
+                      createdAt
+                      status
+                  }
+                }
+                """;
+
+        var idsAsParam = String.join("\", \"", ids);
+        query = String.format(query, idsAsParam);
+
+        var ordersReceived = graphQlTester.document(query)
+                .execute()
+                .path("data.getOrdersByIds")
+                .hasValue()
+                .entityList(Order.class)
+                .hasSizeGreaterThan(0)
+                .get();
+
+        assertEquals(orders, ordersReceived);
+
+        verify(orderService, times(1)).getByIds(ids);
+    }
+
+    @Test
+    void shouldReturnEmptyListOfOrdersWhenGetByIds() {
+
+        var ids = easyRandom.objects(String.class, 3).collect(Collectors.toCollection(LinkedHashSet::new));
+
+        when(orderService.getByIds(ids)).thenReturn(Collections.emptyList());
+
+        String query = """
+                {
+                  getOrdersByIds(ids: ["%s"]) {
+                      id
+                  }
+                }
+                """;
+
+        var idsAsParam = String.join("\", \"", ids);
+        query = String.format(query, idsAsParam);
+
+        graphQlTester.document(query)
+                .execute()
+                .path("data.getOrdersByIds")
+                .hasValue()
+                .entityList(Order.class)
+                .hasSize(0);
+
+        verify(orderService, times(1)).getByIds(ids);
     }
 
     @Test
