@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -47,13 +48,19 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+    @GetMapping("/ids/{ids}")
+    public ResponseEntity<List<Product>> getByIds(@PathVariable Collection<Long> ids) {
+        var products = productService.getByIds(ids);
+        return ResponseEntity.ok(products);
+    }
+
     @PostMapping
     public ResponseEntity<Product> create(@RequestBody ProductDTO productDTO) {
         var product = productService.create(productDTO);
         return ResponseEntity.ok(product);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody ProductDTO productDTO) {
         var product = productService.update(id, productDTO);
         if (product == null) {
@@ -66,5 +73,20 @@ public class ProductController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void deleteById(@PathVariable Long id) {
         productService.deleteById(id);
+    }
+
+    @GetMapping("/categories/by-name/{categoryName}")
+    public ResponseEntity<Category> getCategoryByName(@PathVariable String categoryName) {
+        var category = productService.getCategoryByName(categoryName);
+        if (category == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(category);
+    }
+
+    @GetMapping("/categories/by-names/{categoryNames}")
+    public ResponseEntity<List<Category>> getCategoriesByNames(@PathVariable Collection<String> categoryNames) {
+        var categories = productService.getCategoriesByNames(categoryNames);
+        return ResponseEntity.ok(categories);
     }
 }

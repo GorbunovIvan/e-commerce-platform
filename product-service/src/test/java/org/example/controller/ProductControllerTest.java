@@ -1,9 +1,11 @@
 package org.example.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import jakarta.annotation.PostConstruct;
+import org.example.model.Category;
 import org.example.model.DTO.ProductDTO;
 import org.example.model.Product;
 import org.example.service.ProductService;
@@ -17,7 +19,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
@@ -404,6 +408,62 @@ class ProductControllerTest {
     }
 
     @Test
+    void shouldReturnListOfProductsWhenGetByIds() throws Exception {
+
+        var productsExpected = easyRandom.objects(Product.class, 5).toList();
+        var ids = productsExpected.stream().map(Product::getId).collect(Collectors.toCollection(LinkedHashSet::new));
+        var idsParam = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+
+        when(productService.getByIds(ids)).thenReturn(productsExpected);
+
+        var jsonResponse =
+                given()
+                        .auth().oauth2(jwt.getTokenValue())
+                        .when()
+                        .get("/ids/{id}", idsParam)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .asPrettyString();
+
+        List<Product> products = objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+
+        assertNotNull(products);
+        assertFalse(products.isEmpty());
+        assertEquals(productsExpected, products);
+
+        verify(productService, times(1)).getByIds(ids);
+        verify(productService, only()).getByIds(ids);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenGetByIds() throws JsonProcessingException {
+
+        var ids = easyRandom.objects(Long.class, 3).collect(Collectors.toCollection(LinkedHashSet::new));
+        var idsParam = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+
+        when(productService.getByIds(ids)).thenReturn(Collections.emptyList());
+
+        var jsonResponse =
+                given()
+                        .auth().oauth2(jwt.getTokenValue())
+                        .when()
+                        .get("/ids/{id}", idsParam)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .asPrettyString();
+
+        List<Product> products = objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+
+        assertNotNull(products);
+        assertTrue(products.isEmpty());
+
+        verify(productService, times(1)).getByIds(ids);
+        verify(productService, only()).getByIds(ids);
+    }
+
+    @Test
     void shouldCreateAndReturnNewProductWhenCreate() throws Exception {
 
         when(productService.create(any(ProductDTO.class))).thenAnswer(answer -> {
@@ -467,7 +527,7 @@ class ProductControllerTest {
                         .contentType("application/json")
                         .body(jsonProductDTO)
                         .when()
-                        .patch("/{id}", id)
+                        .put("/{id}", id)
                         .then()
                         .statusCode(200)
                         .extract()
@@ -498,7 +558,7 @@ class ProductControllerTest {
                 .contentType("application/json")
                 .body(jsonProductDTO)
                 .when()
-                .patch("/{id}", id)
+                .put("/{id}", id)
                 .then()
                 .statusCode(404);
 
@@ -520,5 +580,104 @@ class ProductControllerTest {
 
         verify(productService, times(1)).deleteById(id);
         verify(productService, only()).deleteById(id);
+    }
+
+    @Test
+    void shouldReturnCategoryWhenGetCategoryByName() throws Exception {
+
+        var categoryExpected = easyRandom.nextObject(Category.class);
+        var name = categoryExpected.getName();
+
+        when(productService.getCategoryByName(name)).thenReturn(categoryExpected);
+
+        var jsonResponse =
+                given()
+                        .auth().oauth2(jwt.getTokenValue())
+                        .when()
+                        .get("/categories/by-name/{categoryName}", name)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .asPrettyString();
+
+        Category category = objectMapper.readValue(jsonResponse, Category.class);
+
+        assertNotNull(category);
+        assertEquals(categoryExpected, category);
+
+        verify(productService, times(1)).getCategoryByName(name);
+        verify(productService, only()).getCategoryByName(name);
+    }
+
+    @Test
+    void shouldReturnNullWhenGetCategoryByName() {
+
+        var name = "test-category";
+
+        given()
+                .auth().oauth2(jwt.getTokenValue())
+                .when()
+                .get("/categories/by-name/{categoryName}", name)
+                .then()
+                .statusCode(404);
+
+        verify(productService, times(1)).getCategoryByName(name);
+        verify(productService, only()).getCategoryByName(name);
+    }
+
+    @Test
+    void shouldReturnListOfCategoriesWhenGetCategoriesByNames() throws Exception {
+
+        var categoriesExpected = easyRandom.objects(Category.class, 5).toList();
+        var names = categoriesExpected.stream().map(Category::getName).collect(Collectors.toCollection(LinkedHashSet::new));
+        var namesParam = String.join(",", names);
+
+        when(productService.getCategoriesByNames(names)).thenReturn(categoriesExpected);
+
+        var jsonResponse =
+                given()
+                        .auth().oauth2(jwt.getTokenValue())
+                        .when()
+                        .get("/categories/by-names/{categoryNames}", namesParam)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .asPrettyString();
+
+        List<Category> categories = objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+
+        assertNotNull(categories);
+        assertFalse(categories.isEmpty());
+        assertEquals(categoriesExpected, categories);
+
+        verify(productService, times(1)).getCategoriesByNames(names);
+        verify(productService, only()).getCategoriesByNames(names);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenGetCategoriesByNames() throws JsonProcessingException {
+
+        var names = easyRandom.objects(String.class, 3).collect(Collectors.toCollection(LinkedHashSet::new));
+        var namesParam = String.join(",", names);
+
+        when(productService.getCategoriesByNames(names)).thenReturn(Collections.emptyList());
+
+        var jsonResponse =
+                given()
+                        .auth().oauth2(jwt.getTokenValue())
+                        .when()
+                        .get("/categories/by-names/{categoryNames}", namesParam)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .asPrettyString();
+
+        List<Category> categories = objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+
+        assertNotNull(categories);
+        assertTrue(categories.isEmpty());
+
+        verify(productService, times(1)).getCategoriesByNames(names);
+        verify(productService, only()).getCategoriesByNames(names);
     }
 }

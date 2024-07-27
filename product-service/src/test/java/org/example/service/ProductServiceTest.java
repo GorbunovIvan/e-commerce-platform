@@ -1,7 +1,9 @@
 package org.example.service;
 
+import org.example.model.Category;
 import org.example.model.DTO.ProductDTO;
 import org.example.model.Product;
+import org.example.repository.CategoryRepository;
 import org.example.repository.ProductRepository;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.Test;
@@ -12,11 +14,14 @@ import org.springframework.data.domain.Example;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.internal.verification.VerificationModeFactory.only;
 
 @SpringBootTest
 @Transactional
@@ -27,6 +32,8 @@ class ProductServiceTest {
 
     @MockBean
     private ProductRepository productRepository;
+    @MockBean
+    private CategoryRepository categoryRepository;
 
     private final EasyRandom easyRandom = new EasyRandom();
 
@@ -58,6 +65,38 @@ class ProductServiceTest {
 
         verify(productRepository, times(1)).findById(id);
         verify(productRepository, only()).findById(id);
+    }
+
+    @Test
+    void shouldReturnListOfProductsWhenGetByIds() {
+
+        var productsExpected = easyRandom.objects(Product.class, 5).toList();
+        var ids = productsExpected.stream().map(Product::getId).toList();
+
+        when(productRepository.findAllByIdIn(ids)).thenReturn(productsExpected);
+
+        var products = productService.getByIds(ids);
+        assertNotNull(products);
+        assertFalse(products.isEmpty());
+        assertEquals(productsExpected, products);
+
+        verify(productRepository, times(1)).findAllByIdIn(ids);
+        verify(productRepository, only()).findAllByIdIn(ids);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenGetByIds() {
+
+        var ids = easyRandom.objects(Long.class, 3).toList();
+
+        when(productRepository.findAllByIdIn(ids)).thenReturn(Collections.emptyList());
+
+        var products = productService.getByIds(ids);
+        assertNotNull(products);
+        assertTrue(products.isEmpty());
+
+        verify(productRepository, times(1)).findAllByIdIn(ids);
+        verify(productRepository, only()).findAllByIdIn(ids);
     }
 
     @Test
@@ -203,5 +242,67 @@ class ProductServiceTest {
 
         verify(productRepository, times(1)).deleteById(id);
         verify(productRepository, only()).deleteById(id);
+    }
+
+    @Test
+    void shouldReturnCategoryWhenGetCategoryByName() {
+
+        var categoryExpected = easyRandom.nextObject(Category.class);
+        var name = categoryExpected.getName();
+
+        when(categoryRepository.findByName(name)).thenReturn(Optional.of(categoryExpected));
+
+        var category = productService.getCategoryByName(name);
+        assertNotNull(category);
+        assertEquals(categoryExpected, category);
+
+        verify(categoryRepository, times(1)).findByName(name);
+        verify(categoryRepository, only()).findByName(name);
+    }
+
+    @Test
+    void shouldReturnNullWhenGetCategoryByName() {
+
+        var name = "test-category";
+
+        when(categoryRepository.findByName(name)).thenReturn(Optional.empty());
+
+        var category = productService.getCategoryByName(name);
+        assertNull(category);
+
+        verify(categoryRepository, times(1)).findByName(name);
+        verify(categoryRepository, only()).findByName(name);
+    }
+
+    @Test
+    void shouldReturnListOfCategoriesWhenGetCategoriesByNames() {
+
+        var categoriesExpected = easyRandom.objects(Category.class, 5).toList();
+        var names = categoriesExpected.stream().map(Category::getName).collect(Collectors.toCollection(LinkedHashSet::new));
+
+        when(categoryRepository.findAllByNameIn(names)).thenReturn(categoriesExpected);
+
+        var categories = productService.getCategoriesByNames(names);
+        assertNotNull(categories);
+        assertFalse(categories.isEmpty());
+        assertEquals(categoriesExpected, categories);
+
+        verify(categoryRepository, times(1)).findAllByNameIn(names);
+        verify(categoryRepository, only()).findAllByNameIn(names);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenGetCategoriesByNames() {
+
+        var names = easyRandom.objects(String.class, 3).collect(Collectors.toCollection(LinkedHashSet::new));
+
+        when(categoryRepository.findAllByNameIn(names)).thenReturn(Collections.emptyList());
+
+        var categories = productService.getCategoriesByNames(names);
+        assertNotNull(categories);
+        assertTrue(categories.isEmpty());
+
+        verify(categoryRepository, times(1)).findAllByNameIn(names);
+        verify(categoryRepository, only()).findAllByNameIn(names);
     }
 }

@@ -19,11 +19,27 @@ class UserConverterTest {
     @Test
     void shouldReturnUserWhenConvert() {
 
-        var userId = 98L;
+        var userId = 987L;
         var user = easyRandom.nextObject(User.class);
         user.setId(userId);
 
         var userFound = userConverter.convert(Long.toString(userId));
+        assertNotNull(userFound);
+        assertNotNull(userFound.getId());
+        assertEquals(user.getId(), userFound.getId());
+        assertEquals(user, userFound);
+    }
+
+    @Test
+    void shouldReturnUserByPatternWhenConvert() {
+
+        var userId = 987L;
+        var user = easyRandom.nextObject(User.class);
+        user.setId(userId);
+
+        var idParam = "some-text id=" + userId;
+
+        var userFound = userConverter.convert(idParam);
         assertNotNull(userFound);
         assertNotNull(userFound.getId());
         assertEquals(user.getId(), userFound.getId());
