@@ -91,6 +91,48 @@ class GrpcReviewServiceTest {
     }
 
     @Test
+    void shouldReturnReviewsWhenGetByIds() {
+
+        var reviews = easyRandom.objects(Review.class, 7).toList();
+        var ids = reviews.stream().map(Review::getId).toList();
+
+        when(reviewService.getByIds(ids)).thenReturn(reviews);
+
+        var request = IdsRequest.newBuilder()
+                .addAllIds(listToIdsRequest(ids))
+                .build();
+
+        var response = blockingStub.getByIds(request);
+
+        var reviewsReceived = reviewsUtil.toReviews(response);
+        assertNotNull(reviewsReceived);
+        assertFalse(reviewsReceived.isEmpty());
+        assertEquals(new HashSet<>(reviews), new HashSet<>(reviewsReceived));
+
+        verify(reviewService, times(1)).getByIds(ids);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenGetByIds() {
+
+        var ids = easyRandom.objects(String.class, 7).toList();
+
+        when(reviewService.getByIds(ids)).thenReturn(Collections.emptyList());
+
+        var request = IdsRequest.newBuilder()
+                .addAllIds(listToIdsRequest(ids))
+                .build();
+
+        var response = blockingStub.getByIds(request);
+
+        var reviewsReceived = reviewsUtil.toReviews(response);
+        assertNotNull(reviewsReceived);
+        assertTrue(reviewsReceived.isEmpty());
+
+        verify(reviewService, times(1)).getByIds(ids);
+    }
+
+    @Test
     void shouldReturnListOfReviewsWhenGetAll() {
 
         var reviews = easyRandom.objects(Review.class, 7).toList();
@@ -198,16 +240,8 @@ class GrpcReviewServiceTest {
 
         when(reviewService.getRatingInfoOfProducts(productIds)).thenReturn(productAndRatingInfoList);
 
-        var idNumbersRequest = new ArrayList<IdNumberRequest>();
-        for (var productId : productIds) {
-            idNumbersRequest.add(
-                    IdNumberRequest.newBuilder()
-                    .setId(productId)
-                    .build());
-        }
-
         var request = IdNumbersRequest.newBuilder()
-                .addAllIds(idNumbersRequest)
+                .addAllIds(listToIdNumbersRequest(productIds))
                 .build();
 
         var response = blockingStub.getRatingInfoOfProducts(request);
@@ -415,5 +449,16 @@ class GrpcReviewServiceTest {
                             .build());
         }
         return idNumbersRequest;
+    }
+
+    private List<IdRequest> listToIdsRequest(List<String> ids) {
+        var idsRequest = new ArrayList<IdRequest>();
+        for (var id : ids) {
+            idsRequest.add(
+                    IdRequest.newBuilder()
+                            .setId(id)
+                            .build());
+        }
+        return idsRequest;
     }
 }

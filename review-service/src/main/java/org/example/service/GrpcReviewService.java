@@ -49,6 +49,33 @@ public class GrpcReviewService extends GrpcReviewServiceGrpc.GrpcReviewServiceIm
     }
 
     @Override
+    public void getByIds(IdsRequest request, StreamObserver<ReviewsResponse> responseObserver) {
+
+        log.info("GRPC - GrpcReviewService.getByIds({}):", request);
+
+        List<IdRequest> reviewIds = new ArrayList<>();
+
+        try {
+            reviewIds = request.getIdsList();
+            var ids = reviewIds.stream().map(IdRequest::getId).toList();
+
+            var reviews = reviewService.getByIds(ids);
+            var reviewsResponses = reviewsUtil.toReviewsResponses(reviews);
+
+            var response = ReviewsResponse.newBuilder()
+                    .addAllReviews(reviewsResponses)
+                    .build();
+
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+
+        } catch (Exception e) {
+            log.error("GRPC - GrpcReviewService.getByIds({}) - attempt failed! {}", reviewIds, e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
     public void getAll(Empty request, StreamObserver<ReviewsResponse> responseObserver) {
 
         log.info("GRPC - GrpcReviewService.getAll():");

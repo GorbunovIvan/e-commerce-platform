@@ -15,8 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataMongoTest
 class ReviewRepositoryTest {
@@ -38,6 +37,34 @@ class ReviewRepositoryTest {
         for (String collectionName : mongoTemplate.getCollectionNames()) {
             mongoTemplate.dropCollection(collectionName);
         }
+    }
+
+    @Test
+    void shouldReturnListOfReviewsWhenFindAllByIdIn() {
+
+        var reviewsAll = easyRandom.objects(Review.class, 10).toList();
+        reviewsAll.forEach(review -> review.setId(null));
+
+        var reviewsInMongoDB = mongoTemplate.insertAll(reviewsAll);
+
+        var ids = reviewsInMongoDB.stream().map(Review::getId).toList();
+
+        var reviewsReceived = reviewRepository.findAllByIdIn(ids);
+        assertNotNull(reviewsReceived);
+        assertFalse(reviewsReceived.isEmpty());
+        assertEquals(reviewsInMongoDB, reviewsReceived);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenFindAllByIdIn() {
+
+        var reviewsAll = easyRandom.objects(Review.class, 10).toList();
+
+        var ids = reviewsAll.stream().map(Review::getId).toList();
+
+        var reviewsReceived = reviewRepository.findAllByIdIn(ids);
+        assertNotNull(reviewsReceived);
+        assertTrue(reviewsReceived.isEmpty());
     }
 
     @Test
