@@ -7,6 +7,7 @@ import "google/protobuf/empty.proto";
 
 service GrpcReviewService {
   rpc getById(IdRequest) returns(ReviewResponse);
+  rpc getByIds(IdsRequest) returns(ReviewsResponse);
   rpc getAll(google.protobuf.Empty) returns(ReviewsResponse);
   rpc getRatingInfoOfProduct(IdNumberRequest) returns(ProductAndRatingInfoResponse);
   rpc getRatingInfoOfProducts(IdNumbersRequest) returns(ProductAndRatingInfoListResponse);
@@ -50,6 +51,10 @@ message ProductAndRatingInfoListResponse {
 
 message IdRequest {
   string id = 1;
+}
+
+message IdsRequest {
+  repeated IdRequest ids = 1;
 }
 
 message IdNumberRequest {

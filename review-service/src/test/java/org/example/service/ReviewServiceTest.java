@@ -63,6 +63,36 @@ class ReviewServiceTest {
     }
 
     @Test
+    void shouldReturnListOfReviewsWhenGetByIds() {
+
+        var reviews = easyRandom.objects(Review.class, 5).toList();
+        var ids = reviews.stream().map(Review::getId).toList();
+
+        when(reviewRepository.findAllByIdIn(ids)).thenReturn(reviews);
+
+        var reviewsReceived = reviewService.getByIds(ids);
+        assertNotNull(reviewsReceived);
+        assertFalse(reviewsReceived.isEmpty());
+        assertEquals(reviews, reviewsReceived);
+
+        verify(reviewRepository, times(1)).findAllByIdIn(ids);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenGetByIds() {
+
+        var ids = easyRandom.objects(String.class, 3).toList();
+
+        when(reviewRepository.findAllByIdIn(ids)).thenReturn(Collections.emptyList());
+
+        var reviewsReceived = reviewService.getByIds(ids);
+        assertNotNull(reviewsReceived);
+        assertTrue(reviewsReceived.isEmpty());
+
+        verify(reviewRepository, times(1)).findAllByIdIn(ids);
+    }
+
+    @Test
     void shouldReturnListOfReviewsWhenGetAll() {
 
         var reviews = easyRandom.objects(Review.class, 7).toList();
@@ -250,7 +280,6 @@ class ReviewServiceTest {
 
         verify(reviewRepository, times(1)).findAllByProductIdInOrderByRatingDesc(productIdsAll);
     }
-
 
     @Test
     void shouldReturnListOfReviewsWhenGetAllByUser() {
