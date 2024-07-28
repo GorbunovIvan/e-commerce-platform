@@ -51,6 +51,9 @@ public class ProductController {
         var currentUser = getCurrentUserFromModel(model);
         product.setUser(currentUser);
         var productCreated = productService.create(product);
+        if (productCreated == null) {
+            throw new RuntimeException("An error occurred: The product was not created");
+        }
         return "redirect:/products/" + productCreated.getId();
     }
 
