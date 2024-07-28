@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product creation</title>
+</head>
+<body>
+<div>
+    <div th:insert="~{fragments/menu :: commonMenu}"></div>
+    <h3>Product creation page</h3>
+    <div>
+        <form th:method="POST" th:action="@{/products}" th:object="${product}">
+            <div>
+                <label for="name">Name</label>
+                <input id="name" type="text" th:field="*{name}"/>
+            </div>
+            <div>
+                <label for="description">Description</label>
+                <input id="description" type="text" th:field="*{description}"/>
+            </div>
+            <div>
+                <label for="category">Category</label>
+                <input id="category" type="text" th:field="*{category}"/>
+            </div>
+            <div>
+                <input type="submit" value="Create"/>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

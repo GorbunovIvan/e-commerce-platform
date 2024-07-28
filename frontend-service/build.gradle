@@ -1,0 +1,114 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.0'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id 'com.google.protobuf' version '0.8.17'
+}
+
+group = 'org.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+ext {
+    springCloudVersion = '2023.0.2'
+    grpcServerSpringBootStarterVersion = '3.1.0.RELEASE'
+    //protocVersion = '4.27.1' // erroneous
+    protocVersion = '3.25.3'
+    ioGrpcVersion = '1.64.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+//    OAuth2.0 client to have access to secure RESTful remote services
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.security:spring-security-oauth2-client'
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+
+//    GraphQL client
+    implementation 'org.springframework.boot:spring-boot-starter-graphql'
+    implementation 'org.springframework.boot:spring-boot-starter-rsocket'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+//    RabbitMQ
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
+//    GRPC
+    implementation "net.devh:grpc-client-spring-boot-starter:${grpcServerSpringBootStarterVersion}"
+    implementation "com.google.protobuf:protobuf-java:${protocVersion}"
+    implementation "io.grpc:grpc-all:${ioGrpcVersion}"
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+
+//    Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
+//    Keycloak (for web-form authorization)
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.keycloak:keycloak-common:25.0.2'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.jeasy:easy-random-core:5.0.0'
+    testImplementation 'org.wiremock:wiremock-jetty12:3.8.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'build/generated/source/proto/main/grpc'
+            srcDirs 'build/generated/source/proto/main/java'
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protocVersion}"
+    }
+
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:${ioGrpcVersion}"
+        }
+    }
+
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

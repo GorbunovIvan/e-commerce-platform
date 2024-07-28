@@ -1,0 +1,49 @@
+spring:
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+  security:
+    oauth2:
+      client:
+        registration: {}
+        provider: {}
+
+  rabbitmq:
+    host: localhost
+    topicExchange: test-topic
+    queues:
+      order-create: test.order.create.queue
+      order-update: test.order.update.queue
+      order-change-status: test.order.change-status.queue
+      order-delete: test.order.delete.queue
+
+  kafka:
+    notifications-topic: "test-topic"
+
+dummy-repositories:
+  enabled: false
+
+user-service:
+  enabled: false
+  name: user-service
+  url: http://test:8081/api/v1/users
+
+product-service:
+  enabled: false
+  name: product-service
+  url: http://test:8082/api/v1/products
+
+order-service:
+  enabled: false
+  graphql-url: http://test:8083/graphql
+
+review-service:
+  enabled: false
+  grpc:
+    host: test
+    port: 9090
+
+notification-service:
+  enabled: false

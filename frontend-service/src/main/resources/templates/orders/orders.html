@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>orders</title>
+</head>
+<body>
+<div>
+    <div th:insert="~{fragments/menu :: commonMenu}"></div>
+    <h3>Orders page</h3>
+    <div th:if="${currentUser != null}">
+        <p><a href="/orders/new">Add new</a></p>
+    </div>
+    <div>
+        <div th:each="order : ${orders}">
+            <a th:href="@{/orders/__${order.getId()}__}" th:text="${order.shortInfo()}">order</a>
+            <br/>
+        </div>
+    </div>
+</div>
+</body>
+</html>

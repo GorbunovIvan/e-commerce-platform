@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order creation</title>
+</head>
+<body>
+<div>
+    <div th:insert="~{fragments/menu :: commonMenu}"></div>
+    <h3>Order creation page</h3>
+    <div>
+        <form th:method="POST" th:action="@{/orders}" th:object="${order}">
+            <div>
+                <label for="product">Product</label>
+                <input id="product" type="text" name="product" th:value="${order.getProductView()}"/>
+            </div>
+            <div>
+                <label for="user">User</label>
+                <input id="user" type="text" name="user" disabled th:value="${order.getUserView()}"/>
+            </div>
+            <div>
+                <input type="submit" value="Create"/>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

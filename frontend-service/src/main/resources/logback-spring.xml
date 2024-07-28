@@ -1,0 +1,21 @@
+<configuration>
+
+    <!-- Include the default Spring Boot configuration -->
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <!-- Custom appender for intercepting notification -->
+    <appender name="NOTIFICATION" class="org.example.config.NotificationAppender">
+        <!-- This appender will only process "warn" or more severe logs -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="CONSOLE"/> <!-- Reference the default console appender -->
+        <appender-ref ref="NOTIFICATION"/>
+    </root>
+
+</configuration>

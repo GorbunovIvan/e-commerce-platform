@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'users :: ' + ${user.getUsername()}">User</title>
+</head>
+<body>
+<div>
+    <div th:insert="~{fragments/menu :: commonMenu}"></div>
+    <h3>User page</h3>
+    <div>
+        <p>Username: <span th:text="${user.getUsername()}">username</span></p>
+    </div>
+    <div th:if="${currentUser != null && currentUser.equals(user)}">
+        <hr/>
+        <p><a th:href="@{/users/__${user.getId()}__/edit}">Edit user</a></p>
+<!--        Deleting user is disabled, because since in Keycloak user will be remained (don't know how to delete user from there),-->
+<!--        the user with the same username will be immediately recreated from current Principal (look AuthenticationControllerAdvice.class)-->
+<!--        <form th:method="DELETE" th:action="@{/users/__${user.getId()}__}">-->
+<!--            <input type="submit" value="Delete user"/>-->
+<!--        </form>-->
+    </div>
+    <div>
+        <hr/>
+        <h5>Products offered by user</h5>
+        <div th:if="${currentUser != null && currentUser.equals(user)}">
+            <p><a href="/products/new">Add new</a></p>
+        </div>
+        <div th:each="product : ${products}">
+            <a th:href="@{/products/__${product.getId()}__}" th:text="${product.getName()}">product</a>
+            <br/>
+        </div>
+    </div>
+    <div>
+        <hr/>
+        <h5>Orders made by user</h5>
+        <div th:each="order : ${orders}">
+            <a th:href="@{/orders/__${order.getId()}__}" th:text="${order.shortInfo()}">order</a>
+            <br/>
+        </div>
+    </div>
+    <div>
+        <hr/>
+        <h5>Reviews made by user</h5>
+        <div th:each="review : ${reviews}">
+            <a th:href="@{/reviews/__${review.getId()}__}" th:text="${review.shortInfo()}">review</a>
+            <br/>
+        </div>
+    </div>
+</div>
+</body>
+</html>

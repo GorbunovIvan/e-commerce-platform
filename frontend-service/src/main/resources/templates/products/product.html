@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'products :: ' + ${product.getName()}">Product</title>
+</head>
+<body>
+<div>
+    <div th:insert="~{fragments/menu :: commonMenu}"></div>
+    <h3>Product page</h3>
+    <div>
+        <p>Name: <span th:text="${product.getName()}">name</span></p>
+        <p>Description: <span th:text="${product.getDescription()}">description</span></p>
+        <p>Category: <span th:text="${product.getCategoryName()}">category</span></p>
+        <p>Rating: <span th:text="${productAndRatingInfo.getRating()}">rating</span> (by <span th:text="${productAndRatingInfo.getNumberOfReviews()}">number of reviews</span> reviews)</p>
+        <p>Created at: <span th:text="${product.getCreatedAt()}">createdAt</span></p>
+        <p>by User: <a th:href="@{/users/__${product.getUserId()}__}" th:text="${product.getUserUsername()}">user</a></p>
+    </div>
+    <div th:if="${currentUser != null && currentUser.equals(product.getUser())}">
+        <hr/>
+        <p><a th:href="@{/products/__${product.getId()}__/edit}">Edit product</a></p>
+        <form th:method="DELETE" th:action="@{/products/__${product.getId()}__}">
+            <input type="submit" value="Delete product"/>
+        </form>
+    </div>
+    <div>
+        <hr/>
+        <h5>Orders</h5>
+        <div th:if="${currentUser != null && !currentUser.equals(product.getUser())}">
+            <p><a th:href="@{/orders/new?product=__${product.getId()}__}">Make an order</a></p>
+        </div>
+        <div th:each="order : ${orders}">
+            <a th:href="@{/orders/__${order.getId()}__}" th:text="${order.shortInfo()}">order</a>
+            <br/>
+        </div>
+    </div>
+    <div>
+        <hr/>
+        <h5>Reviews</h5>
+        <p>Average rating: <span th:text="${productAndRatingInfo.getRating()}">rating</span></p>
+        <p>Number of reviews: <span th:text="${productAndRatingInfo.getNumberOfReviews()}">number of reviews</span></p>
+        <div th:if="${currentUser != null && !currentUser.equals(product.getUser())}">
+            <p><a th:href="@{/reviews/new?product=__${product.getId()}__}">Add review</a></p>
+        </div>
+        <div th:each="review : ${productAndRatingInfo.getReviews()}">
+            <a th:href="@{/reviews/__${review.getId()}__}" th:text="${review.shortInfo()}">review</a>
+            <br/>
+        </div>
+    </div>
+</div>
+</body>
+</html>

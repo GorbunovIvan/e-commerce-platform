@@ -9,26 +9,27 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/user-service" />
-            <option value="$PROJECT_DIR$/product-service" />
-            <option value="$PROJECT_DIR$/order-service" />
-            <option value="$PROJECT_DIR$/review-service" />
+            <option value="$PROJECT_DIR$/frontend-service" />
             <option value="$PROJECT_DIR$/notification-service" />
+            <option value="$PROJECT_DIR$/order-service" />
+            <option value="$PROJECT_DIR$/product-service" />
+            <option value="$PROJECT_DIR$/review-service" />
+            <option value="$PROJECT_DIR$/user-service" />
           </set>
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/user-service" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/product-service" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/order-service" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/review-service" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/frontend-service" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/frontend-service" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/notification-service" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$/user-service" />
-            <option value="$PROJECT_DIR$/product-service" />
-            <option value="$PROJECT_DIR$/order-service" />
-            <option value="$PROJECT_DIR$/review-service" />
             <option value="$PROJECT_DIR$/notification-service" />
           </set>
         </option>

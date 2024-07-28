@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'products :: editing :: ' + ${product.getName()}">Editing product</title>
+</head>
+<body>
+<div>
+    <div th:insert="~{fragments/menu :: commonMenu}"></div>
+    <h3>Product editing page</h3>
+    <div th:if="${currentUser != null && currentUser.equals(product.getUser())}">
+        <form th:method="PATCH" th:action="@{/products/__${product.getId()}__}" th:object="${product}">
+            <div>
+                <label for="name">Name</label>
+                <input id="name" type="text" th:field="*{name}"/>
+            </div>
+            <div>
+                <label for="description">Description</label>
+                <input id="description" type="text" th:field="*{description}"/>
+            </div>
+            <div>
+                <label for="category">Category</label>
+                <input id="category" type="text" th:field="*{category.name}"/>
+            </div>
+            <div>
+                <input type="submit" value="Update"/>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
