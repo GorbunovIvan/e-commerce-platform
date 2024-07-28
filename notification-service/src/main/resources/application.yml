@@ -1,0 +1,28 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: notification-service
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: app.1
+#      auto-offset-reset: latest
+    notifications-topic: "notifications-topic"
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: amosovivan91@gmail.com
+    password: "mcyx kbwf pvpo mmwj" # generated password in gmail for third-party apps
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+consumer:
+  enabled: true
+
+mail:
+  receiver: gorbunovvivan@gmail.com
