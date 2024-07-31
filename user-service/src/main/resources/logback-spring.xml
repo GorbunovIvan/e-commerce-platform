@@ -6,16 +6,6 @@
     <!-- From VM option  -->
     <variable name="LOG_FILE_PATH" value="${LOG_FILE_PATH:-D:/Java/projects/microservices/e-commerce-platform-folder/e-commerce-platform/logs/logfile.log}"/>
 
-    <!-- Custom appender for intercepting notification -->
-    <appender name="NOTIFICATION" class="org.example.config.NotificationAppender">
-        <!-- This appender will only process "warn" or more severe logs -->
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>WARN</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-    </appender>
-
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>${LOG_FILE_PATH}</file>
         <append>true</append>
@@ -27,7 +17,6 @@
     <root level="info">
         <appender-ref ref="CONSOLE"/> <!-- Reference the default console appender -->
         <appender-ref ref="FILE" />
-        <appender-ref ref="NOTIFICATION"/>
     </root>
 
 </configuration>
