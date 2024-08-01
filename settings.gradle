@@ -1,3 +1,12 @@
 rootProject.name = 'e-commerce-platform'
 
-include('user-service', 'product-service', 'order-service', 'review-service', 'notification-service', 'frontend-service')
+include(
+        'user-service',
+        'product-service',
+        'order-service',
+        'review-service',
+        'notification-service',
+        'frontend-service',
+        'eureka-server',
+        'api-gateway'
+)
