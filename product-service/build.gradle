@@ -18,6 +18,10 @@ configurations {
     }
 }
 
+ext {
+    springCloudVersion = '2023.0.2'
+}
+
 repositories {
     mavenCentral()
 }
@@ -32,6 +36,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.security:spring-security-oauth2-jose'
 
+    //  Eureka infrastructure
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
     runtimeOnly 'org.postgresql:postgresql'
 
     compileOnly 'org.projectlombok:lombok'
@@ -43,6 +50,12 @@ dependencies {
     testImplementation 'org.jeasy:easy-random-core:5.0.0'
     testImplementation 'io.rest-assured:rest-assured:5.4.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 tasks.named('test') {

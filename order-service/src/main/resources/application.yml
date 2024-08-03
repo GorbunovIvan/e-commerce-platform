@@ -21,3 +21,10 @@ spring:
       order-update: order.update.queue
       order-change-status: order.change-status.queue
       order-delete: order.delete.queue
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.uuid}

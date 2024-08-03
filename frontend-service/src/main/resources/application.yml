@@ -50,6 +50,13 @@ spring:
   kafka:
     notifications-topic: "notifications-topic"
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    hostname: ${spring.application.name}
+
 keycloak:
   server-url: http://localhost:8080
   realm: e-commerce-platform
@@ -61,16 +68,16 @@ dummy-repositories:
 user-service:
   enabled: true
   name: user-service
-  url: http://localhost:8081/api/v1/users
+  url: http://localhost:8765/user-service/api/v1/users
 
 product-service:
   enabled: true
   name: product-service
-  url: http://localhost:8082/api/v1/products
+  url: http://localhost:8765/product-service/api/v1/products
 
 order-service:
   enabled: true
-  graphql-url: http://localhost:8083/graphql
+  graphql-url: http://localhost:8765/order-service/graphql
 
 review-service:
   enabled: true

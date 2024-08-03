@@ -26,3 +26,10 @@ consumer:
 
 mail:
   receiver: gorbunovvivan@gmail.com
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.uuid}

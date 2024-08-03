@@ -18,6 +18,10 @@ configurations {
     }
 }
 
+ext {
+    springCloudVersion = '2023.0.2'
+}
+
 repositories {
     mavenCentral()
 }
@@ -30,6 +34,9 @@ dependencies {
 
     implementation 'com.graphql-java:graphql-java-extended-scalars:22.0' // We need it for additional types in graphql schema
 
+//    Eureka infrastructure
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
@@ -39,6 +46,12 @@ dependencies {
     testImplementation 'org.springframework.graphql:spring-graphql-test'
     testImplementation 'org.jeasy:easy-random-core:5.0.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 tasks.named('test') {

@@ -40,6 +40,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
+//    Eureka infrastructure
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
 //    OAuth2.0 client to have access to secure RESTful remote services
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.security:spring-security-oauth2-client'
