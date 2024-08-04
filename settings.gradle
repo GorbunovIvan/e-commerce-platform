@@ -8,5 +8,6 @@ include(
         'notification-service',
         'frontend-service',
         'eureka-server',
-        'api-gateway'
+        'api-gateway',
+        'config-server'
 )
