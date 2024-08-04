@@ -1,20 +1,5 @@
-server:
-  port: 8084
-
 spring:
   application:
     name: review-service
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/e-commerce-platform-review-service
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-  instance:
-    instance-id: ${spring.application.name}:${random.uuid}
-
-grpc:
-  server:
-    port: 9090 # default
+  config:
+    import: configserver:http://localhost:8888

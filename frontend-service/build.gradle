@@ -42,6 +42,7 @@ dependencies {
 
 //    Eureka infrastructure
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
 
 //    OAuth2.0 client to have access to secure RESTful remote services
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'

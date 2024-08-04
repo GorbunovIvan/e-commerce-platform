@@ -22,6 +22,9 @@ spring:
   kafka:
     notifications-topic: "test-topic"
 
+  config:
+    import: "optional:configserver:"
+
 dummy-repositories:
   enabled: false
 
