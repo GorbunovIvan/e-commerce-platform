@@ -1,0 +1,16 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: file:///D:/Java/projects/microservices/e-commerce-platform-folder/e-commerce-platform/config-server/config-repo
+#          uri: https://github.com/GorbunovIvan/config-repo-blog-platform.git
+#          username: <github-username>
+#          password: <github-password>
+          default-label: master
+          search-paths: "{application}"

@@ -1,0 +1,22 @@
+<configuration>
+
+    <!-- Include the default Spring Boot configuration -->
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <!-- From VM option  -->
+    <variable name="LOG_FILE_PATH" value="${LOG_FILE_PATH:-D:/Java/projects/microservices/e-commerce-platform-folder/e-commerce-platform/logs/logfile.log}"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_FILE_PATH}</file>
+        <append>true</append>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern> <!-- Default pattern -->
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="CONSOLE"/> <!-- Reference the default console appender -->
+        <appender-ref ref="FILE" />
+    </root>
+
+</configuration>

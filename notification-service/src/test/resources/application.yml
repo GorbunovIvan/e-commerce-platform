@@ -12,5 +12,8 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
+  config:
+    import: "optional:configserver:"
+
 mail:
   receiver: test-receiver@gmail.com
