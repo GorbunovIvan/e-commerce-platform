@@ -1,0 +1,111 @@
+services:
+
+  #  Postgres
+  postgres-db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: e-commerce-platform-product-service
+    healthcheck:
+      # We need to pass the user and database argument (user follows "-U" param and db follows "-d" param):
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "e-commerce-platform-product-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  #  Postgres - we need it for Keycloak
+  postgres-keycloak:
+    image: docker.io/bitnami/postgresql:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_USERNAME=bn_keycloak
+      - POSTGRESQL_DATABASE=bitnami_keycloak
+    volumes:
+      - postgres-keycloak_data:/bitnami/postgresql
+
+  #  Keycloak
+  keycloak:
+    depends_on:
+      - postgres-keycloak
+    image: bitnami/keycloak:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - KEYCLOAK_CREATE_ADMIN_USER=true
+      # If you want to use keycloak on your local machine you should use localhost DNS, like the next two lines:
+#      - KC_HOSTNAME=http://localhost:8080/
+#      - KC_HOSTNAME_BACKCHANNEL_DYNAMIC=true
+
+#      - KEYCLOAK_USER=user
+#      - KEYCLOAK_PASSWORD=bitnami
+      - KEYCLOAK_DATABASE_HOST=postgres-keycloak
+#      - KEYCLOAK_DATABASE_USER=bn_keycloak
+#      - KEYCLOAK_DATABASE_NAME=bitnami_keycloak
+    volumes:
+      - keycloak_data:/bitnami/keycloak
+
+  #  Config-server
+  config-server:
+    image: ivangorbunovv/config-server-e-commerce-platform-image
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.cloud.config.server.git.uri" : "https://github.com/GorbunovIvan/config-repo-e-commerce-platform.git",
+          "spring.cloud.config.server.git.username" : "GorbunovIvan",
+          "spring.cloud.config.server.git.password" : "246aintzZ",
+          "spring.cloud.config.server.git.default-label" : "main"
+      }'
+
+  #  Eureka-server
+  eureka-server:
+    depends_on:
+      - config-server
+    image: ivangorbunovv/eureka-server-e-commerce-platform-image
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+  #  Api-gateway
+  api-gateway:
+    depends_on:
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/api-gateway-e-commerce-platform-image
+    ports:
+      - "8765:8765"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+  #  This app (product-service)
+  product-service:
+    depends_on:
+      - postgres-db
+      - keycloak
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/product-service-e-commerce-platform-image
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+volumes:
+  postgres-data:
+    driver: local
+  postgres-keycloak_data:
+    driver: local
+  keycloak_data:
+    driver: local

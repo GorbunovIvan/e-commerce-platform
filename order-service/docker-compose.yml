@@ -1,0 +1,77 @@
+services:
+
+  #  MongoDB
+  mongo:
+    image: mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  #  RabbitMQ
+  rabbitmq:
+    image: rabbitmq:latest
+    ports:
+      - "5673:5672"  # RabbitMQ port
+      - "15673:15672"  # RabbitMQ management UI port
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  #  Config-server
+  config-server:
+    image: ivangorbunovv/config-server-e-commerce-platform-image
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.cloud.config.server.git.uri" : "https://github.com/GorbunovIvan/config-repo-e-commerce-platform.git",
+          "spring.cloud.config.server.git.username" : "GorbunovIvan",
+          "spring.cloud.config.server.git.password" : "246aintzZ",
+          "spring.cloud.config.server.git.default-label" : "main"
+      }'
+
+  #  Eureka-server
+  eureka-server:
+    depends_on:
+      - config-server
+    image: ivangorbunovv/eureka-server-e-commerce-platform-image
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+  #  Api-gateway
+  api-gateway:
+    depends_on:
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/api-gateway-e-commerce-platform-image
+    ports:
+      - "8765:8765"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+  #  This app (order-service)
+  order-service:
+    depends_on:
+      - mongo
+      - rabbitmq
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/order-service-e-commerce-platform-image
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+volumes:
+  mongo-data:
+    driver: local
+  rabbitmq-data:
+    driver: local
