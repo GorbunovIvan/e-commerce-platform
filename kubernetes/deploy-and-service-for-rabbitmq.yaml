@@ -1,3 +1,35 @@
+# Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rabbitmq-pv
+  labels:
+    app: e-commerce-platform-rabbitmq
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/rabbitmq"  # This path is on the host node's file system
+
+---
+# Volume Claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-pvc
+  labels:
+    app: e-commerce-platform-rabbitmq
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# RabbitMQ Deployment
 apiVersion : apps/v1
 kind: Deployment
 metadata:
@@ -22,8 +54,16 @@ spec:
             name: rmq-amqp
           - containerPort: 15672
             name: rmq-management
+        volumeMounts:
+          - mountPath: /var/lib/rabbitmq  # RabbitMQ data directory
+            name: rabbitmq-storage
+      volumes:
+        - name: rabbitmq-storage
+          persistentVolumeClaim:
+            claimName: rabbitmq-pvc
 
 ---
+# RabbitMQ Service
 apiVersion: v1
 kind: Service
 metadata:

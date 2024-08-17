@@ -1,3 +1,36 @@
+# Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kafka-pv
+  labels:
+    app: kafka
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /mnt/data/kafka
+
+---
+# Volume Claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# Kafka Deployment
 apiVersion : apps/v1
 kind: Deployment
 metadata:
@@ -32,8 +65,16 @@ spec:
           value: "CONTROLLER"
         - name: KAFKA_CFG_MESSAGE_MAX_BYTES
           value: "100000000"
+        volumeMounts:
+          - name: kafka-storage
+            mountPath: /opt/kafka
+      volumes:
+      - name: kafka-storage
+        persistentVolumeClaim:
+          claimName: kafka-pvc
 
 ---
+# Kafka Service
 apiVersion: v1
 kind: Service
 metadata:

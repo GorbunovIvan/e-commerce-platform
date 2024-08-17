@@ -1,3 +1,35 @@
+# Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"  # This path is on the host where the pod is running.
+
+---
+# Volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+      
+---
+# Postgres Deployment
 apiVersion : apps/v1
 kind: Deployment
 metadata:
@@ -14,6 +46,13 @@ spec:
       labels:
         project: e-commerce-platform-postgres
     spec:
+      initContainers:
+      - name: init-postgres
+        image: busybox
+        command: ['sh', '-c', 'rm -rf /var/lib/postgresql/data/pgdata/*']
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data/pgdata
+          name: postgres-storage
       containers:
         - name : postgres
           image: postgres:latest
@@ -26,6 +65,11 @@ spec:
               value: "root"
             - name: POSTGRES_DB
               value: "e-commerce-platform-product-service"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data/pgdata
+              name: postgres-storage
           readinessProbe:
             exec:
               command:
@@ -39,8 +83,13 @@ spec:
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 3
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
 
 ---
+# Postgres Service
 apiVersion: v1
 kind: Service
 metadata:

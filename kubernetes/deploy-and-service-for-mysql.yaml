@@ -1,3 +1,35 @@
+# Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/mysql"
+
+---
+# Volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# MySQL Deployment
 apiVersion : apps/v1
 kind: Deployment
 metadata:
@@ -24,7 +56,16 @@ spec:
               value: "root"
             - name: MYSQL_DATABASE
               value: "e-commerce-platform-user-service"
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+
 ---
+# MySQL Service
 apiVersion: v1
 kind: Service
 metadata:

@@ -1,3 +1,35 @@
+# Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: keycloak-pv
+  labels:
+    app: e-commerce-platform-keycloak
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data/keycloak
+
+---
+# Volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-pvc
+  labels:
+    app: e-commerce-platform-keycloak
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# Keycloak Deployment
 apiVersion : apps/v1
 kind: Deployment
 metadata:
@@ -25,8 +57,16 @@ spec:
               value: "admin"
           ports:
             - containerPort: 8080
+          volumeMounts:
+            - name: keycloak-data
+              mountPath: /opt/keycloak/data
+      volumes:
+        - name: keycloak-data
+          persistentVolumeClaim:
+            claimName: keycloak-pvc
 
 ---
+# Keycloak Service
 apiVersion: v1
 kind: Service
 metadata:
