@@ -1,0 +1,48 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: config-server-deployment
+  labels:
+    app: e-commerce-platform-config-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      project: e-commerce-platform-config-server
+  template:
+    metadata:
+      labels:
+        project: e-commerce-platform-config-server
+    spec:
+      containers:
+        - name: config-server
+          image: ivangorbunovv/e-commerce-platform:config-server
+          ports:
+            - containerPort: 8888
+          env:
+            - name: SPRING_APPLICATION_JSON
+              value: >
+                {
+                 "spring.cloud.config.server.git.uri" : "https://github.com/GorbunovIvan/config-repo-e-commerce-platform-main-K8S.git",
+                 "spring.cloud.config.server.git.username" : "GorbunovIvan",
+                 "spring.cloud.config.server.git.password" : "246aintzZ",
+                 "spring.cloud.config.server.git.default-label" : "master"
+                }
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-server
+  labels:
+     env  : dev
+     owner: IvanGorbunov
+spec:
+  selector:
+    project: e-commerce-platform-config-server
+  ports:
+    - name      : config-server-listener
+      protocol  : TCP
+      port      : 8888
+      targetPort: 8888
+  #type: CLusterIP

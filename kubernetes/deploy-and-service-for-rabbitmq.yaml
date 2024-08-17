@@ -1,0 +1,46 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-deployment
+  labels:
+    app: e-commerce-platform-rabbitmq
+spec:
+  replicas: 1 #2
+  selector:
+    matchLabels:
+      project: e-commerce-platform-rabbitmq
+  template:
+    metadata:
+      labels:
+        project: e-commerce-platform-rabbitmq
+    spec:
+      containers:
+      - name: rabbit
+        image: rabbitmq:latest
+        ports:
+          - containerPort: 5672
+            name: rmq-amqp
+          - containerPort: 15672
+            name: rmq-management
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbit
+  labels:
+     env  : dev
+     owner: IvanGorbunov
+spec:
+  selector:
+    project: e-commerce-platform-rabbitmq
+  ports:
+    - name: rabbitmq-amqp-listener
+      protocol: TCP
+      port: 5672
+      targetPort: 5672
+    - name: rabbitmq-management-listener
+      protocol: TCP
+      port: 15672
+      targetPort: 15672
+  #type: CLusterIP
