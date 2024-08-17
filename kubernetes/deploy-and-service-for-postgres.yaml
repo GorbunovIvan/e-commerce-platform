@@ -1,0 +1,108 @@
+# Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"  # This path is on the host where the pod is running.
+
+---
+# Volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+      
+---
+# Postgres Deployment
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: e-commerce-platform-postgres
+spec:
+  replicas: 1 #2
+  selector:
+    matchLabels:
+      project: e-commerce-platform-postgres
+  template:
+    metadata:
+      labels:
+        project: e-commerce-platform-postgres
+    spec:
+      initContainers:
+      - name: init-postgres
+        image: busybox
+        command: ['sh', '-c', 'rm -rf /var/lib/postgresql/data/pgdata/*']
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data/pgdata
+          name: postgres-storage
+      containers:
+        - name : postgres
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "root"
+            - name: POSTGRES_DB
+              value: "e-commerce-platform-product-service"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data/pgdata
+              name: postgres-storage
+          readinessProbe:
+            exec:
+              command:
+                - "pg_isready"
+                - "-U"
+                - "postgres"
+                - "-d"
+                - "e-commerce-platform-product-service"
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+
+---
+# Postgres Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-db
+  labels:
+     env  : dev
+     owner: IvanGorbunov
+spec:
+  selector:
+    project: e-commerce-platform-postgres
+  ports:
+    - name      : postgres-listener
+      protocol  : TCP
+      port      : 5432
+      targetPort: 5432
+  #type: CLusterIP

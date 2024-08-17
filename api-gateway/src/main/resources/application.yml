@@ -2,4 +2,4 @@ spring:
   application:
     name: api-gateway
   config:
-    import: configserver:http://localhost:8888
+    import: optional:configserver:http://localhost:8888 # We need this to be "optional", otherwise it can't be changed in docker-compose (via "environment" variables) - and the service will fail to run straightaway.

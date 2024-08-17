@@ -1,0 +1,236 @@
+services:
+
+  #  MySQL service
+  mysql-db:
+    image: mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: e-commerce-platform-user-service
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  #  Postgres
+  postgres-db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: e-commerce-platform-product-service
+    healthcheck:
+      # We need to pass the user and database argument (user follows "-U" param and db follows "-d" param):
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "e-commerce-platform-product-service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  #  MongoDB
+  mongo:
+    image: mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  #  Kafka
+  kafka:
+    image: 'bitnami/kafka:latest'
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+    volumes:
+      - kafka-data:/bitnami/kafka
+
+  #  RabbitMQ
+  rabbitmq:
+    image: rabbitmq:latest
+    ports:
+      - "5673:5672"  # RabbitMQ port
+      - "15673:15672"  # RabbitMQ management UI port
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  # Localhost - we need it to enabled seamless communication between Keycloak and services that use it
+  localhost:
+    image: alpine:latest
+    command: sleep infinity
+    ports:
+      - "8080:8080" # Keycloak port
+      - "8081:8081" # User-service port
+      - "8082:8082" # Product-service port
+      - "8086:8086" # Frontend-service port
+
+  #  Keycloak
+  keycloak:
+    depends_on:
+      - localhost
+    image: quay.io/keycloak/keycloak:latest
+#    ports:
+#      - "8080:8080" # Commented out because ports are bound via the "localhost" service
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: start-dev
+    network_mode: "service:localhost"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+
+  #  Config-server
+  config-server:
+    image: ivangorbunovv/config-server-e-commerce-platform-image
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.cloud.config.server.git.uri" : "https://github.com/GorbunovIvan/config-repo-e-commerce-platform-2.git",
+          "spring.cloud.config.server.git.username" : "GorbunovIvan",
+          "spring.cloud.config.server.git.password" : "246aintzZ",
+          "spring.cloud.config.server.git.default-label" : "master"
+      }'
+
+  #  Eureka-server
+  eureka-server:
+    depends_on:
+      - config-server
+    image: ivangorbunovv/eureka-server-e-commerce-platform-image
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+  #  Api-gateway
+  api-gateway:
+    depends_on:
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/api-gateway-e-commerce-platform-image
+    ports:
+      - "8765:8765"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+  #  This app (user-service)
+  user-service:
+    depends_on:
+      - mysql-db
+      - localhost
+      - keycloak
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/user-service-e-commerce-platform-image
+#    ports:
+#      - "8081:8081" # Commented out because ports are bound via the "localhost" service
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+    network_mode: "service:localhost"
+
+  #  This app (product-service)
+  product-service:
+    depends_on:
+      - postgres-db
+      - localhost
+      - keycloak
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/product-service-e-commerce-platform-image
+#    ports:
+#      - "8082:8082" # Commented out because ports are bound via the "localhost" service
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+    network_mode: "service:localhost"
+
+  #  This app (order-service)
+  order-service:
+    depends_on:
+      - mongo
+      - rabbitmq
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/order-service-e-commerce-platform-image
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+  #  This app (review-service)
+  review-service:
+    depends_on:
+      - mongo
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/review-service-e-commerce-platform-image
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+  #  This app (notification-service)
+  notification-service:
+    depends_on:
+      - kafka
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/notification-service-e-commerce-platform-image
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888",
+          "mail.username" : "amosovivan91@gmail.com",
+          "mail.password" : "mcyx kbwf pvpo mmwj",
+          "mail.receiver" : "gorbunovvivan@gmail.com"
+      }'
+
+  #  This app (frontend-service)
+  frontend-service:
+    depends_on:
+      - localhost
+      - keycloak
+      - kafka
+      - rabbitmq
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/frontend-service-e-commerce-platform-image
+#    ports:
+#      - "8086:8086" # Commented out because ports are bound via the "localhost" service
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+    network_mode: "service:localhost"
+
+volumes:
+  mysql_data:
+    driver: local
+  postgres-data:
+    driver: local
+  mongo-data:
+    driver: local
+  kafka-data:
+    driver: local
+  rabbitmq-data:
+    driver: local
+  keycloak_data:
+    driver: local

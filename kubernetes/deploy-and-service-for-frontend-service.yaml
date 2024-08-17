@@ -1,0 +1,45 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: e-commerce-platform-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      project: e-commerce-platform-frontend
+  template:
+    metadata:
+      labels:
+        project: e-commerce-platform-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ivangorbunovv/e-commerce-platform:frontend-service
+          ports:
+            - containerPort: 8086
+          env:
+            - name: SPRING_APPLICATION_JSON
+              value: >
+                {
+                 "spring.config.import" : "configserver:http://config-server:8888"
+                }
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  labels:
+     env  : dev
+     owner: IvanGorbunov
+spec:
+  selector:
+    project: e-commerce-platform-frontend
+  ports:
+    - name      : frontend-listener
+      protocol  : TCP
+      port      : 8086
+      targetPort: 8086
+  #type: CLusterIP

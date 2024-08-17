@@ -1,0 +1,76 @@
+# Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-pv
+spec:
+  capacity:
+    storage: 1Gi  # Size of the storage
+  accessModes:
+    - ReadWriteOnce  # Can be mounted as read-write by a single node
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: "/mnt/data/mongo"  # Path on the node where data will be stored (useful for local development)
+
+---
+# Volume Claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# Mongo Deployment
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  labels:
+    app: e-commerce-platform-mongo
+spec:
+  replicas: 1 #2
+  selector:
+    matchLabels:
+      project: e-commerce-platform-mongo
+  template:
+    metadata:
+      labels:
+        project: e-commerce-platform-mongo
+    spec:
+      containers:
+        - name : mongo
+          image: mongo:latest
+          ports:
+          - containerPort: 27017
+          volumeMounts:
+            - name: mongo-storage
+              mountPath: /data/db  # Default path for MongoDB data
+      volumes:
+        - name: mongo-storage
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+
+---
+# Mongo Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-db
+  labels:
+    env  : dev
+    owner: IvanGorbunov
+spec:
+  selector:
+    project: e-commerce-platform-mongo
+  ports:
+    - name      : mongo-listener
+      protocol  : TCP
+      port      : 27018
+      targetPort: 27017
+  #type: CLusterIP

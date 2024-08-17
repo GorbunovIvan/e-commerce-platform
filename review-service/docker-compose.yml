@@ -1,0 +1,67 @@
+services:
+
+  #  MongoDB
+  mongo:
+    image: mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  #  Config-server
+  config-server:
+    image: ivangorbunovv/config-server-e-commerce-platform-image
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.cloud.config.server.git.uri" : "https://github.com/GorbunovIvan/config-repo-e-commerce-platform.git",
+          "spring.cloud.config.server.git.username" : "GorbunovIvan",
+          "spring.cloud.config.server.git.password" : "246aintzZ",
+          "spring.cloud.config.server.git.default-label" : "main"
+      }'
+
+  #  Eureka-server
+  eureka-server:
+    depends_on:
+      - config-server
+    image: ivangorbunovv/eureka-server-e-commerce-platform-image
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+  #  Api-gateway
+  api-gateway:
+    depends_on:
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/api-gateway-e-commerce-platform-image
+    ports:
+      - "8765:8765"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+  #  This app (review-service)
+  review-service:
+    depends_on:
+      - mongo
+      - config-server
+      - eureka-server
+    image: ivangorbunovv/review-service-e-commerce-platform-image
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.config.import" : "configserver:http://config-server:8888"
+      }'
+
+volumes:
+  mongo-data:
+    driver: local
+  rabbitmq-data:
+    driver: local

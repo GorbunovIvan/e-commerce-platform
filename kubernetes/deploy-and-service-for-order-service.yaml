@@ -1,0 +1,45 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: order-service-deployment
+  labels:
+    app: e-commerce-platform-order-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      project: e-commerce-platform-order-service
+  template:
+    metadata:
+      labels:
+        project: e-commerce-platform-order-service
+    spec:
+      containers:
+        - name: order-service
+          image: ivangorbunovv/e-commerce-platform:order-service
+          ports:
+            - containerPort: 8084
+          env:
+            - name: SPRING_APPLICATION_JSON
+              value: >
+                {
+                 "spring.config.import" : "configserver:http://config-server:8888"
+                }
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  labels:
+     env  : dev
+     owner: IvanGorbunov
+spec:
+  selector:
+    project: e-commerce-platform-order-service
+  ports:
+    - name      : order-service-listener
+      protocol  : TCP
+      port      : 8084
+      targetPort: 8084
+  #type: CLusterIP

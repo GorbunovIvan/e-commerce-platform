@@ -1,0 +1,84 @@
+# Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: keycloak-pv
+  labels:
+    app: e-commerce-platform-keycloak
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data/keycloak
+
+---
+# Volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-pvc
+  labels:
+    app: e-commerce-platform-keycloak
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# Keycloak Deployment
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: keycloak-deployment
+  labels:
+    app: e-commerce-platform-keycloak
+spec:
+  replicas: 1 #2
+  selector:
+    matchLabels:
+      project: e-commerce-platform-keycloak
+  template:
+    metadata:
+      labels:
+        project: e-commerce-platform-keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:latest
+          command: ["sh", "-c", "/opt/keycloak/bin/kc.sh start-dev"]
+          env:
+            - name: KEYCLOAK_ADMIN
+              value: "admin"
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: "admin"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: keycloak-data
+              mountPath: /opt/keycloak/data
+      volumes:
+        - name: keycloak-data
+          persistentVolumeClaim:
+            claimName: keycloak-pvc
+
+---
+# Keycloak Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  labels:
+    env  : dev
+    owner: IvanGorbunov
+spec:
+  selector:
+    project: e-commerce-platform-keycloak
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  #type: CLusterIP
